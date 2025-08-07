@@ -3,10 +3,47 @@ import './App.css';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import logo from "./TMF icon.jpg";
-
 function App() {
-  const generateId = () => Date.now() + Math.random();
+const exportPDF = () => {
+  const input = document.getElementById("exportable-area");
+  if (!input) {
+    alert("Export area not found");
+    return;
+  }
 
+  html2canvas(input, {
+    scale: 2, // increase resolution
+    scrollY: -window.scrollY, // to avoid clipping if page is scrolled
+    useCORS: true, // allow cross-origin images (like your logo)
+  })
+    .then((canvas) => {
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("portrait", "pt", "a4"); // or 'landscape' if you prefer
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+
+      // Calculate image height to keep aspect ratio
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = imgWidth / imgHeight;
+      let pdfImgHeight = pdfWidth / ratio;
+
+      // If the canvas height is taller than one page, you need to split into pages:
+      if (pdfImgHeight > pdfHeight) {
+        // For very tall content, you might want to add multiple pages (advanced)
+        // For now, just fit to one page (may compress)
+        pdfImgHeight = pdfHeight;
+      }
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfImgHeight);
+      pdf.save("weld-history.pdf");
+    })
+    .catch((err) => {
+      console.error("Error exporting PDF:", err);
+      alert("Error exporting PDF: " + err.message);
+    });};const generateId = () => Date.now() + Math.random();
+  const saveData = () => { /*...*/ };
+  const loadData = (event) => { /*...*/ };
   // Dropdown options
   const weldNoOptions = Array.from({ length: 25 }, (_, i) => `W${i + 1}`);
   const welderIdOptions = Array.from({ length: 5 }, (_, i) => `TMF-00${i + 1}`);
@@ -213,21 +250,10 @@ function App() {
 
   const handleDragOver = (e) => e.preventDefault();
 
-  // Export to PDF
-  const exportPDF = () => {
-    const input = document.getElementById("exportable-area");
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("landscape", "pt", "a4");
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("weld-history.pdf");
-    });
-  };
-
+  // Save and trigger download
+;
   return (
+  
     <div style={{ fontSize: "12pt", padding: 20 }}>
       <img src={logo} alt="logo" style={{ width: 200, marginBottom: 10 }} />
       <h1 style={{ lineHeight: 1.4 }}>Weld History</h1>
@@ -322,9 +348,21 @@ function App() {
         <button onClick={addScope} style={{ marginRight: 10 }}>
           Add Scope
         </button>
-        <button onClick={exportPDF}>Export to PDF</button>
+        <button onClick={ exportPDF}>Export to PDF</button>
       </div>
 
+<div>
+  {/* Your existing UI */}
+
+  <button onClick={saveData}>Save Work</button>
+
+  <input
+    type="file"
+    accept="application/json"
+    onChange={loadData}
+    style={{ marginLeft: 20 }}
+  />
+</div>
       <div id="exportable-area">
         {scopes.map((scope, sIdx) => (
           <div
@@ -843,4 +881,8 @@ function App() {
 }
 
 export default App;
+
+
+
+
 
