@@ -1,9 +1,215 @@
-import React, { useState } from "react";
 import './App.css';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import logo from "./TMF icon.jpg";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+function ImageDropField({ onImageChange }) {
+  const [dragActive, setDragActive] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImagePreview(reader.result);
+          if (onImageChange) onImageChange(file);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('Please drop an image file.');
+      }
+    }
+  };
+
+  const handleChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImagePreview(reader.result);
+          if (onImageChange) onImageChange(file);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('Please select an image file.');
+      }
+    }
+  };
+
+  return (
+    <div
+      onDragEnter={handleDrag}
+      onDragOver={handleDrag}
+      onDragLeave={handleDrag}
+      onDrop={handleDrop}
+      style={{
+        border: dragActive ? '3px dashed #4A90E2' : '3px dashed #ccc',
+        borderRadius: '12px',
+        width: '400px',
+        height: '300px',
+        margin: '20px auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        cursor: 'pointer',
+        backgroundColor: dragActive ? '#f0f8ff' : '#fafafa',
+        transition: 'border-color 0.3s, background-color 0.3s',
+        userSelect: 'none',
+      }}
+      onClick={() => document.getElementById('imageUploadInput').click()}
+    >
+      {imagePreview ? (
+        <img
+          src={imagePreview}
+          alt="Preview"
+          style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '8px' }}
+        />
+      ) : (
+        <>
+          <p style={{ fontSize: '18px', color: '#666', textAlign: 'center' }}>
+            Drag & Drop an image here, or click to select
+          </p>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              document.getElementById('imageUploadInput').click();
+            }}
+            style={{
+              padding: '8px 16px',
+              fontSize: '16px',
+              borderRadius: '6px',
+              border: 'none',
+              backgroundColor: '#4A90E2',
+              color: '#fff',
+              cursor: 'pointer',
+              marginTop: '10px',
+            }}
+          >
+            Select Image
+          </button>
+        </>
+      )}
+      <input
+        id="imageUploadInput"
+        type="file"
+        accept="image/*"
+        style={{ display: 'none' }}
+        onChange={handleChange}
+      />
+    </div>
+  );
+}
+function AutoResizeTextarea({ value, onChange }) {
+  const textareaRef = useRef(null);
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; // reset height to get correct scrollHeight
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px'; // set height to fit content
+    }
+  }, [value]); // re-run when value changes
+  return (
+    <textarea
+      ref={textareaRef}
+      value={value}
+      onChange={onChange}
+      rows={3}
+      style={{
+        whiteSpace: 'pre-wrap',
+        width: '100%',
+        boxSizing: 'border-box',
+        resize: 'none',
+        overflow: 'hidden',
+        overflowWrap: 'break-word',
+      }}
+    />
+  );
+}
+function SupervisorSignatureInput({ supervisorSignature, setSupervisorSignature }) {
+  const fileInputRef = useRef(null);
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setSupervisorSignature(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  const handleDragOver = (e) => e.preventDefault();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setSupervisorSignature(reader.result);
+    reader.readAsDataURL(file);
+  };
+
+  return (
+    <div
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onClick={() => fileInputRef.current && fileInputRef.current.click()}
+      style={{
+        border: "2px dashed #999",
+        borderRadius: 6,
+        width: 150,
+        height: 80,
+        cursor: "pointer",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "#999",
+        position: "relative",
+        marginLeft: 10,
+      }}
+      title="Click or drag & drop signature image here"
+    >
+      {supervisorSignature ? (
+        <img
+          src={supervisorSignature}
+          alt="Supervisor Signature"
+          style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+        />
+      ) : (
+        <span>Drop Signature</span>
+      )}
+      <input
+        type="file"
+        accept="image/*"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
+    </div>
+  );
+}
 function App() {
+const handleImageChange = (file) => {
+    console.log('Selected image file:', file);
+    // You can save file or preview URL to state here if needed
+  };
+const [scopeDescription, setScopeDescription] = useState('');
 const exportPDF = () => {
   const input = document.getElementById("exportable-area");
   if (!input) {
@@ -42,8 +248,6 @@ const exportPDF = () => {
       console.error("Error exporting PDF:", err);
       alert("Error exporting PDF: " + err.message);
     });};const generateId = () => Date.now() + Math.random();
-  const saveData = () => { /*...*/ };
-  const loadData = (event) => { /*...*/ };
   // Dropdown options
   const weldNoOptions = Array.from({ length: 25 }, (_, i) => `W${i + 1}`);
   const welderIdOptions = Array.from({ length: 5 }, (_, i) => `TMF-00${i + 1}`);
@@ -51,7 +255,6 @@ const exportPDF = () => {
   const weldingProcesses = ["MMAW", "SMAW", "GTAW", "GMAW", "GTAW/MMAW", "GTAW/SMAW", "GTAW/GMAW"];
   const welderNames = ["Dion James", "Blair Denis", "Brody Alcock", "Josh King", "Jesse Zepperlen"];
   const passNoOptions = ["1", "2", "3", "4", "5"];
-
   const materialThicknessOptions = [...Array(24)].map((_, i) => `${i + 2} mm`);
   const materialTypeOptions = [
     "Grade 250 to Grade 250", "Grade 250 to Grade 350", "Grade 350 to Grade 350",
@@ -85,7 +288,6 @@ const exportPDF = () => {
     WeldingProcedureSpecificationNo: "",
     WeldingProcess: "",
     Welder: "",
-    PassNo: "",
     JointTypeImage: "",
     ItemToItem: "",
     Description: "",
@@ -129,24 +331,98 @@ const exportPDF = () => {
   const [supervisorSignature, setSupervisorSignature] = useState("");
   const [finalCompletionDate, setFinalCompletionDate] = useState("");
 
-  // Add a new scope with initial rows
-  const addScope = () => {
-    setScopes((prev) => [
-      ...prev,
-      {
-        id: generateId(),
-        materialRows: [createMaterialRow()],
-        traceabilityRows: [createTraceabilityRow()],
-        weldHistoryRows: [createWeldHistoryRow()],
-      },
-    ]);
-  };
+//save data in local storage
+useEffect(() => {
+  const stored = localStorage.getItem("weldAppData");
+  if (stored) {
+    setScopes(JSON.parse(stored));
+  }
+}, []);
 
+// Auto-save every time scopes changes
+useEffect(() => {
+  localStorage.setItem("weldAppData", JSON.stringify(scopes));
+}, [scopes]);
+
+const loadData = (e) => {
+  const fileReader = new FileReader();
+  fileReader.onload = (event) => {
+    try {
+      const importedData = JSON.parse(event.target.result);
+      setScopes(importedData);
+    } catch (err) {
+      alert("Invalid JSON file.");
+    }
+  };
+  if (e.target.files[0]) {
+    fileReader.readAsText(e.target.files[0]);
+  }
+};
+
+const exportData = () => {
+  const dataStr = JSON.stringify(scopes, null, 2); // Pretty format
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "weld-data-backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+};
+const importData = (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      setScopes(data);
+    } catch (err) {
+      alert("Invalid backup file.");
+    }
+  };
+  reader.readAsText(file);
+};
+
+
+  // Add a new scope with initial rows
+const addScope = () => {
+  setScopes((prev) => [
+    ...prev,
+    {
+      id: generateId(),
+      materialRows: [createMaterialRow()],
+      traceabilityRows: [createTraceabilityRow()],
+      weldHistoryRows: [createWeldHistoryRow()],
+      weldMapImage: null, // for storing the image file or data
+      weldMapText: '',    // for storing the text from AutoResizeTextarea
+    },
+  ]);
+};
+
+//Handlers for Weld map
+const updateWeldMapImage = (scopeId, file) => {
+  setScopes((prev) =>
+    prev.map((scope) =>
+      scope.id === scopeId ? { ...scope, weldMapImage: file } : scope
+    )
+  );
+};
+
+const updateWeldMapText = (scopeId, text) => {
+  setScopes((prev) =>
+    prev.map((scope) =>
+      scope.id === scopeId ? { ...scope, weldMapText: text } : scope
+    )
+  );
+};
   // Update functions for project info
   const updateProjectInfo = (field, value) => {
     setProjectInfo((prev) => ({ ...prev, [field]: value }));
   };
-
   // Update material row field
   const updateMaterialRowField = (scopeId, rowId, field, value) => {
     setScopes((prev) =>
@@ -162,51 +438,59 @@ const exportPDF = () => {
     );
   };
 
-  // Update traceability row field and sync Weld History on shared fields
-  const updateTraceabilityRowField = (scopeId, rowId, field, value) => {
-    setScopes((prev) =>
-      prev.map((scope) => {
-        if (scope.id !== scopeId) return scope;
+// Update traceability row field and sync Weld History on shared fields
+const updateRowField = (scopeId, rowId, field, value) => {
+  setScopes((prev) =>
+    prev.map((scope) => {
+      if (scope.id !== scopeId) return scope;
 
-        const updatedTraceabilityRows = scope.traceabilityRows.map((row) =>
-          row.id === rowId ? { ...row, [field]: value } : row
-        );
+      const updateRowsArray = (rows) =>
+        rows.map((row) => (row.id === rowId ? { ...row, [field]: value } : row));
 
-        // Sync Weld History for matching row index (assuming same index)
-        const weldHistoryRows = [...scope.weldHistoryRows];
-        const traceabilityIndex = scope.traceabilityRows.findIndex((r) => r.id === rowId);
+      // Update traceabilityRows with the new field value
+      const updatedTraceabilityRows = updateRowsArray(scope.traceabilityRows);
 
-        if (traceabilityIndex >= 0 && weldHistoryRows[traceabilityIndex]) {
-          const whRow = { ...weldHistoryRows[traceabilityIndex] };
-          // Fields to sync from traceability to weld history
-          const syncFields = [
-            "WeldNo",
-            "WelderId",
-            "WeldingProcedureSpecificationNo",
-            "WeldingProcess",
-            "Welder",
-            "PassNo",
-            "JointTypeImage",
-          ];
-          if (syncFields.includes(field)) {
-            whRow[field] = value;
-          }
-          // Sync NDE fields from traceability to weld history if relevant
-          if (field === "NDEResult") whRow.NDEResult = value;
-          if (field === "NDEReportNo") whRow.NDEReport = value;
+      // Sync Weld History for matching row index (assuming same index)
+      const weldHistoryRows = [...scope.weldHistoryRows];
+      const traceabilityIndex = scope.traceabilityRows.findIndex((r) => r.id === rowId);
 
-          weldHistoryRows[traceabilityIndex] = whRow;
+      if (traceabilityIndex >= 0 && weldHistoryRows[traceabilityIndex]) {
+        const whRow = { ...weldHistoryRows[traceabilityIndex] };
+        // Fields to sync from traceability to weld history
+        const syncFields = [
+          "WeldNo",
+          "WelderId",
+          "WeldingProcedureSpecificationNo",
+          "WeldingProcess",
+          "Welder",
+          "PassNo",
+          "JointTypeImage",
+        ];
+        if (syncFields.includes(field)) {
+          whRow[field] = value;
         }
+        // Sync NDE fields from traceability to weld history if relevant
+        if (field === "NDEResult") whRow.NDEResult = value;
+        if (field === "NDEReportNo") whRow.NDEReport = value;
 
-        return {
-          ...scope,
-          traceabilityRows: updatedTraceabilityRows,
-          weldHistoryRows,
-        };
-      })
-    );
-  };
-
+        weldHistoryRows[traceabilityIndex] = whRow;
+      }
+      return {
+        ...scope,
+        traceabilityRows: updatedTraceabilityRows,
+        weldHistoryRows,
+      };
+    })
+  );
+};
+//create Empty Material register row fields
+// Define this near the top of your component (or file if outside)
+const createEmptyMaterialRow = () => ({
+  id: Date.now(), // or a better unique id generator
+  supplier: '',
+  certificationNo: '',
+  batchNo: '',
+});
   // Update weld history row field (only editable fields)
   const updateWeldHistoryRowField = (scopeId, rowId, field, value) => {
     setScopes((prev) =>
@@ -236,19 +520,35 @@ const exportPDF = () => {
     );
   };
 
-  // Handle drag & drop image for Joint Type in Traceability table
-  const handleFileDrop = (e, scopeId, rowId) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      updateTraceabilityRowField(scopeId, rowId, "JointTypeImage", reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
+  // Add Material Register Rows
 
-  const handleDragOver = (e) => e.preventDefault();
+  function addMaterialRow(scopeId) {
+  setScopes(prevScopes =>
+    prevScopes.map(scope => {
+      if (scope.id === scopeId) {
+        return {
+          ...scope,
+          materialRows: [...scope.materialRows, createEmptyMaterialRow()],
+        };
+      }
+      return scope;
+    })
+  );
+}
+  // Handle drag & drop image for Joint Type in Traceability table
+const handleFileDrop = (e, scopeId, rowId, fieldName) => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    // Use a generic update function with fieldName
+    updateRowField(scopeId, rowId, fieldName, reader.result);
+  };
+  reader.readAsDataURL(file);
+};
+
+const handleDragOver = (e) => e.preventDefault();
 
   // Save and trigger download
 ;
@@ -256,7 +556,7 @@ const exportPDF = () => {
   
     <div style={{ fontSize: "12pt", padding: 20 }}>
       <img src={logo} alt="logo" style={{ width: 200, marginBottom: 10 }} />
-      <h1 style={{ lineHeight: 1.4 }}>Weld History</h1>
+      <h1 style={{ lineHeight: 1.4 }}>Project Report </h1>
 
       {/* Project Info */}
       <div
@@ -337,13 +637,19 @@ const exportPDF = () => {
         }}
       >
         <strong>Welding Requirement Details:</strong>
-        <div>Design Standard - AS 4041-2006 Pressure Piping.</div>
-        <div>Manufacture Standard - AS 4458-1997 (R2016) Pressure Equipment.</div>
-        <div>Weld Standard - AS 3992-2020 Pressure Equipment.</div>
-        <div>Inspections Required - AS 4037-1999 Pressure Equipment.</div>
-      </div>
-
+        <div>Design Standard - AS 4041-2006 Pressure Piping. Manufacture Standard - AS 4458-1997 (R2016) Pressure Equipment. Weld Standard - AS 3992-2020 Pressure Equipment.Inspections Required - AS 4037-1999 Pressure Equipment.</div>
+        </div>
       {/* Controls */}
+      <div style={{ marginBottom: "20px" }}>
+  <button onClick={exportData}>Download Backup</button>
+  <input
+    type="file"
+    accept="application/json"
+    onChange={importData}
+    style={{ marginLeft: "10px" }}
+  />
+</div>
+
       <div style={{ marginBottom: 20 }}>
         <button onClick={addScope} style={{ marginRight: 10 }}>
           Add Scope
@@ -351,17 +657,7 @@ const exportPDF = () => {
         <button onClick={ exportPDF}>Export to PDF</button>
       </div>
 
-<div>
-  {/* Your existing UI */}
-
-  <button onClick={saveData}>Save Work</button>
-
-  <input
-    type="file"
-    accept="application/json"
-    onChange={loadData}
-    style={{ marginLeft: 20 }}
-  />
+<div style={{ marginBottom: 20 }}>
 </div>
       <div id="exportable-area">
         {scopes.map((scope, sIdx) => (
@@ -374,9 +670,24 @@ const exportPDF = () => {
             }}
           >
             <h2>Scope {sIdx + 1}</h2>
+  
+
 
             {/* Material Certificate Register */}
-            <h3>Material Certificate Register</h3>
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
+  <h3 style={{ margin: 0, marginRight: 16 }}>Material Certificate Register</h3>
+  
+  <label htmlFor="scopeDescription" style={{ fontWeight: 'bold', marginRight: 8, whiteSpace: 'nowrap' }}>
+    Scope Description
+  </label>
+ <AutoResizeTextarea
+    id="scopeDescription"
+    value={scopeDescription}
+    onChange={(e) => setScopeDescription(e.target.value)}
+    style={{ padding: 8, fontSize: 14, boxSizing: 'border-box', width: '250px' }}
+    placeholder="Enter scope description"
+  />
+</div>
             <table
               border="1"
               cellPadding="5"
@@ -390,42 +701,46 @@ const exportPDF = () => {
                   <th>Serial/Heat No</th>
                   <th>Description</th>
                   <th>Material Grade</th>
-                  <th>Material Thickness</th>
+                  <th>In Service Date</th>
                 </tr>
               </thead>
               <tbody>
                 {scope.materialRows.map((row) => (
                   <tr key={row.id}>
                     <td>
-                      <input
-                        type="text"
-                        value={row.supplier}
-                        onChange={(e) =>
+<AutoResizeTextarea 
+  value={row.supplier}
+  onChange={(e) =>
                           updateMaterialRowField(scope.id, row.id, "supplier", e.target.value)
                         }
-                      />
+  rows={3}       // sets visible height
+  style={{ whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box',    resize: 'none',            // optional: prevent manual resize
+    overflowWrap: 'break-word' // wrap long words if needed
+    }} // wrap + allow resize
+/>
                     </td>
                     <td>
-                      <input
-                        type="text"
+                      <AutoResizeTextarea  
                         value={row.certNo}
                         onChange={(e) =>
                           updateMaterialRowField(scope.id, row.id, "certNo", e.target.value)
                         }
+                          rows={3}       // sets visible height
+  style={{ whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
                       />
                     </td>
                     <td>
-                      <input
-                        type="text"
+                      <AutoResizeTextarea 
                         value={row.batchNo}
                         onChange={(e) =>
                           updateMaterialRowField(scope.id, row.id, "batchNo", e.target.value)
                         }
-                      />
+                      rows={3}       // sets visible height
+  style={{ whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
+  />
                     </td>
                     <td>
-                      <input
-                        type="text"
+                      <AutoResizeTextarea 
                         value={row.serialNo}
                         onChange={(e) =>
                           updateMaterialRowField(scope.id, row.id, "serialNo", e.target.value)
@@ -433,8 +748,7 @@ const exportPDF = () => {
                       />
                     </td>
                     <td>
-                      <input
-                        type="text"
+                      <AutoResizeTextarea 
                         value={row.description}
                         onChange={(e) =>
                           updateMaterialRowField(scope.id, row.id, "description", e.target.value)
@@ -455,9 +769,8 @@ const exportPDF = () => {
                         ))}
                       </select>
                       {row.grade === "Other" && (
-                        <input
+                        <AutoResizeTextarea 
                           placeholder="Specify other"
-                          type="text"
                           value={row.gradeOther}
                           onChange={(e) =>
                             updateMaterialRowField(scope.id, row.id, "gradeOther", e.target.value)
@@ -466,39 +779,27 @@ const exportPDF = () => {
                         />
                       )}
                     </td>
-                    <td>
-                      <select
-                        value={row.thickness}
-                        onChange={(e) =>
-                          updateMaterialRowField(scope.id, row.id, "thickness", e.target.value)
-                        }
-                      >
-                        {materialThicknessOptions.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                        <option value="Other">Other</option>
-                      </select>
-                      {row.thickness === "Other" && (
-                        <input
-                          placeholder="Specify other"
-                          type="text"
-                          value={row.thicknessOther}
-                          onChange={(e) =>
-                            updateMaterialRowField(scope.id, row.id, "thicknessOther", e.target.value)
-                          }
-                          style={{ marginTop: 5 }}
-                        />
-                      )}
-                    </td>
+<td>
+  <input
+    type="date"
+    value={row.inServiceDate || ''}
+    onChange={(e) =>
+      updateMaterialRowField(scope.id, row.id, "inServiceDate", e.target.value)
+    }
+    style={{ width: '100%', boxSizing: 'border-box' }}
+  />
+</td>
                   </tr>
                 ))}
               </tbody>
+{/* Add Row Button */}
+<div style={{ marginBottom: 20 }}>
+  <button onClick={() => addMaterialRow(scope.id)}>Add Row</button>
+</div>
             </table>
 
-            {/* Welding and Material Traceability Record */}
-            <h3>Welding and Material Traceability Record</h3>
+            {/* Test Request */}
+            <h3>Test Request</h3>
             <table
               border="1"
               cellPadding="5"
@@ -506,25 +807,23 @@ const exportPDF = () => {
             >
               <thead>
                 <tr>
-                  <th>Weld No</th>
+                  <th colSpan={7}>Weld Details</th>
+                  <th colSpan={4}>NDE Method</th>
+                  <th colSpan={3}>NDE Report</th>
+                  </tr>
+                  <tr>
                   <th>Welder ID</th>
-                  <th>Date</th>
+                  <th>Weld No</th>
                   <th>WPS No</th>
                   <th>Welding Process</th>
-                  <th>Welder</th>
-                  <th>Pass No</th>
-                  <th>Weld Joint Type<br/>(Drag & Drop Image)</th>
-                  <th>Item to Item</th>
-                  <th>Description e.g. Joint Type</th>
-                  <th>Electrode Batch No</th>
-                  <th colSpan={6}>NDE</th>
-                </tr>
-                <tr>
-                  <th colSpan={11}></th>
-                  <th>Prep Check</th>
-                  <th>Final Visual</th>
+                  <th>Description</th>
+                  <th>Material Thickness</th>
+                  <th>Material Type to Material Type</th>
+                  <th>Visual</th>
+                  <th>Initial</th>
                   <th>M.T./U.T.</th>
-                  <th>Initials</th>
+                  <th>Initial</th>
+                  <th>Date</th>
                   <th>Results</th>
                   <th>Report No</th>
                 </tr>
@@ -534,9 +833,24 @@ const exportPDF = () => {
                   <tr key={row.id}>
                     <td>
                       <select
+                        value={row.WelderId}
+                        onChange={(e) =>
+                          updateRowField(scope.id, row.id, "WelderId", e.target.value)
+                        }
+                      >
+                        <option value="">Select</option>
+                        {welderIdOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td>
+                      <select
                         value={row.WeldNo}
                         onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "WeldNo", e.target.value)
+                          updateRowField(scope.id, row.id, "WeldNo", e.target.value)
                         }
                       >
                         <option value="">Select</option>
@@ -549,33 +863,9 @@ const exportPDF = () => {
                     </td>
                     <td>
                       <select
-                        value={row.WelderId}
-                        onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "WelderId", e.target.value)
-                        }
-                      >
-                        <option value="">Select</option>
-                        {welderIdOptions.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="date"
-                        value={row.Date}
-                        onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "Date", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <select
                         value={row.WeldingProcedureSpecificationNo}
                         onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "WeldingProcedureSpecificationNo", e.target.value)
+                          updateRowField(scope.id, row.id, "WeldingProcedureSpecificationNo", e.target.value)
                         }
                       >
                         <option value="">Select</option>
@@ -590,7 +880,7 @@ const exportPDF = () => {
                       <select
                         value={row.WeldingProcess}
                         onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "WeldingProcess", e.target.value)
+                          updateRowField(scope.id, row.id, "WeldingProcess", e.target.value)
                         }
                       >
                         <option value="">Select</option>
@@ -602,14 +892,22 @@ const exportPDF = () => {
                       </select>
                     </td>
                     <td>
-                      <select
-                        value={row.Welder}
+                      <AutoResizeTextarea
+                        value={row.Description}
                         onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "Welder", e.target.value)
+                          updateRowField(scope.id, row.id, "Description", e.target.value)
+                        }
+                      />
+                    </td>
+                    <td>
+                      <select
+                        value={row.MaterialThickness}
+                        onChange={(e) =>
+                          updateRowField(scope.id, row.id, "MaterialThickness", e.target.value)
                         }
                       >
                         <option value="">Select</option>
-                        {welderNames.map((opt) => (
+                        {materialThicknessOptions.map((opt) => (
                           <option key={opt} value={opt}>
                             {opt}
                           </option>
@@ -617,19 +915,54 @@ const exportPDF = () => {
                       </select>
                     </td>
                     <td>
-                      <select
-                        value={row.PassNo}
+                      <AutoResizeTextarea
+                        value={row.MaterialTypeToMaterialType}
                         onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "PassNo", e.target.value)
+                          updateRowField(scope.id, row.id, "MaterialTypeToMaterialType", e.target.value)
                         }
-                      >
-                        <option value="">Select</option>
-                        {passNoOptions.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeTextarea
+                        value={row.Visual}
+                        onChange={(e) =>
+                          updateRowField(scope.id, row.id, "Visual", e.target.value)
+                        }
+                      />
+                    </td>
+<td
+  onDrop={(e) => handleFileDrop(e, scope.id, row.id, "Initial")}
+  onDragOver={handleDragOver}
+  style={{
+    width: 80,
+    height: 50,
+    border: "1px dashed #999",
+    textAlign: "center",
+    verticalAlign: "middle",
+    cursor: "pointer",
+  }}
+  title="Drag & drop image here"
+>
+  {row.JointTypeImage ? (
+    <img
+      src={row.Prepinitials}
+      alt="Initial"
+      style={{ maxWidth: "100%", maxHeight: "48px" }}
+    />
+  ) : (
+    <div style={{ fontSize: 10, color: "#999", marginTop: 12 }}>
+      Drop Image
+    </div>
+  )}
+</td>
+
+                    <td>
+                      <AutoResizeTextarea
+                        value={row.ItemToItem}
+                        onChange={(e) =>
+                          updateRowField(scope.id, row.id, "ItemToItem", e.target.value)
+                        }
+                      />
                     </td>
                     <td
                       onDrop={(e) => handleFileDrop(e, scope.id, row.id)}
@@ -656,86 +989,30 @@ const exportPDF = () => {
                         </div>
                       )}
                     </td>
+                    {/* NDE report columns */}
                     <td>
-                      <input
-                        type="text"
-                        value={row.ItemToItem}
+                    <input
+                        type="date"
+                        value={row.NDEPrepCheck || ''}
                         onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "ItemToItem", e.target.value)
+                        updateRowField(scope.id, row.id, "Date", e.target.value)
+                           }
+                           style={{ width: '100%', boxSizing: 'border-box', padding: 6 }}
+                         />
+                       </td>
+                    <td>
+                      <AutoResizeTextarea
+                        value={row.Results}
+                        onChange={(e) =>
+                          updateRowField(scope.id, row.id, "Results", e.target.value)
                         }
                       />
                     </td>
                     <td>
-                      <input
-                        type="text"
-                        value={row.Description}
+                      <AutoResizeTextarea
+                        value={row.ReportNo}
                         onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "Description", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={row.ElectrodeBatchNo}
-                        onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "ElectrodeBatchNo", e.target.value)
-                        }
-                      />
-                    </td>
-
-                    {/* NDE columns */}
-                    <td>
-                      <input
-                        type="text"
-                        value={row.NDEPrepCheck}
-                        onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "NDEPrepCheck", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={row.NDEFinalVisual}
-                        onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "NDEFinalVisual", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={row.NDEMTUT}
-                        onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "NDEMTUT", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={row.NDEInitials}
-                        onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "NDEInitials", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={row.NDEResult}
-                        onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "NDEResult", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={row.NDEReportNo}
-                        onChange={(e) =>
-                          updateTraceabilityRowField(scope.id, row.id, "NDEReportNo", e.target.value)
+                          updateRowField(scope.id, row.id, "ReportNo", e.target.value)
                         }
                       />
                     </td>
@@ -756,45 +1033,143 @@ const exportPDF = () => {
               cellPadding="5"
               style={{ borderCollapse: "collapse", width: "100%" }}
             >
-              <thead>
-                <tr>
-                  <th>Weld No</th>
-                  <th>Welder ID</th>
-                  <th>WPS No</th>
-                  <th>Welder</th>
-                  <th>Pass No</th>
-                  <th>Weld Joint Type</th>
-                  <th>Prep Checked By</th>
-                  <th>Prep Initials</th>
-                  <th>Final Checked By</th>
-                  <th>Final Initials</th>
-                  <th>M.T./U.T.</th>
-                  <th>Result</th>
-                  <th>Report No</th>
-                </tr>
-              </thead>
+<thead>
+  <tr>
+    <th rowSpan={2}>Weld No</th>
+    <th rowSpan={2}>Welder ID</th>
+    <th rowSpan={2}>Date</th>
+    <th rowSpan={2}>WPS No</th>
+    <th rowSpan={2}>Welding Process</th>
+    <th
+      rowSpan={2}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '80px' }}
+    >
+      <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
+        Welder<br />Pass No
+      </div>
+    </th>
+    <th rowSpan={2}>Weld Joint Type</th>
+    <th
+      rowSpan={2}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '120px' }}
+    >
+      <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
+        Item to Item<br />Description
+      </div>
+    </th>
+    <th rowSpan={2}>Electrode Batch No</th>
+
+    {/* NDE grouped header spanning 7 columns */}
+    <th colSpan={7} style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '16px' }}>
+      NDE
+    </th>
+  </tr>
+  <tr>
+    {/* NDE sub-headers in second row only */}
+    <th>Prep Checked By</th>
+    <th>Final Visual</th>
+    <th>Date</th>
+    <th>M.T./U.T.</th>
+    <th>Initials</th>
+    <th>Result</th>
+    <th>Report No</th>
+  </tr>
+</thead>
+
+
               <tbody>
                 {scope.weldHistoryRows.map((row) => (
                   <tr key={row.id}>
                     <td>{row.WeldNo}</td>
                     <td>{row.WelderId}</td>
-                    <td>{row.WeldingProcedureSpecificationNo}</td>
-                    <td>{row.Welder}</td>
-                    <td>{row.PassNo}</td>
                     <td>
-                      {row.JointTypeImage ? (
-                        <img
-                          src={row.JointTypeImage}
-                          alt="Joint Type"
-                          style={{ maxWidth: 80, maxHeight: 50 }}
-                        />
-                      ) : (
-                        ""
-                      )}
+                    <input
+                        type="date"
+                        value={row.NDEPrepCheck || ''}
+                        onChange={(e) =>
+                        updateRowField(scope.id, row.id, "Date", e.target.value)
+                           }
+                           style={{ width: '100%', boxSizing: 'border-box', padding: 6 }}
+                         />
+                       </td>
+                    <td>{row.WeldingProcedureSpecificationNo}</td>
+                    <td>{row.WeldingProcess}</td>
+                                       <td>
+                      <select
+                        value={row.welderNames}
+                        onChange={(e) =>
+                          updateRowField(scope.id, row.id, "welderNames", e.target.value)
+                        }
+                      >
+                        <option value="">Select Welder Name</option>
+                        {welderNames.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+  <select
+    value={row.PassNoOptions}
+    onChange={(e) =>
+      updateRowField(scope.id, row.id, "PassNo", e.target.value)
+    }
+    style={{ width: '100%' }}
+  >
+    <option value="">Select Pass No</option>
+    {passNoOptions.map((opt) => (
+      <option key={opt} value={opt}>
+        {opt}
+      </option>
+    ))}
+  </select>
+                    </td>
+                    <td
+  onDrop={(e) => handleFileDrop(e, scope.id, row.id, "Weld Joint Type")}
+  onDragOver={handleDragOver}
+  style={{
+    width: 80,
+    height: 50,
+    border: "1px dashed #999",
+    textAlign: "center",
+    verticalAlign: "middle",
+    cursor: "pointer",
+  }}
+  title="Drag & drop image here"
+>
+  {row.JointTypeImage ? (
+    <img
+      src={row.WeldJointType}
+      alt="Initial"
+      style={{ maxWidth: "100%", maxHeight: "48px" }}
+    />
+  ) : (
+    <div style={{ fontSize: 10, color: "#999", marginTop: 12 }}>
+      Drop Image
+    </div>
+  )}
+</td>
+<td style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+  <AutoResizeTextarea
+    value={row.itemToItem}
+    onChange={(e) => updateRowField(scope.id, row.id, 'itemToItem', e.target.value)}
+    placeholder="Item To Item"
+  />
+  <AutoResizeTextarea
+    value={row.description}
+    onChange={(e) => updateRowField(scope.id, row.id, 'description', e.target.value)}
+    placeholder="Description"
+  />
+</td>
+                    <td>
+                      <AutoResizeTextarea
+                        value={row.ElectrodeBatchNo}
+                        onChange={(e) =>
+                          updateWeldHistoryRowField(scope.id, row.id, "Electrode Batch No", e.target.value)
+                        }
+                      />
                     </td>
                     <td>
-                      <input
-                        type="text"
+                      <AutoResizeTextarea
                         value={row.PrepCheckedBy}
                         onChange={(e) =>
                           updateWeldHistoryRowField(scope.id, row.id, "PrepCheckedBy", e.target.value)
@@ -802,32 +1177,23 @@ const exportPDF = () => {
                       />
                     </td>
                     <td>
-                      <input
-                        type="text"
-                        value={row.PrepInitials}
+                      <AutoResizeTextarea
+                        value={row.FinalVisual}
                         onChange={(e) =>
-                          updateWeldHistoryRowField(scope.id, row.id, "PrepInitials", e.target.value)
+                          updateWeldHistoryRowField(scope.id, row.id, "FinalVisual", e.target.value)
                         }
                       />
                     </td>
                     <td>
-                      <input
-                        type="text"
-                        value={row.FinalCheckedBy}
+                    <input
+                        type="date"
+                        value={row.NDEPrepCheck || ''}
                         onChange={(e) =>
-                          updateWeldHistoryRowField(scope.id, row.id, "FinalCheckedBy", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        value={row.FinalInitials}
-                        onChange={(e) =>
-                          updateWeldHistoryRowField(scope.id, row.id, "FinalInitials", e.target.value)
-                        }
-                      />
-                    </td>
+                        updateRowField(scope.id, row.id, "Date", e.target.value)
+                           }
+                           style={{ width: '100%', boxSizing: 'border-box', padding: 6 }}
+                         />
+                       </td>
                     <td>
                       <input
                         type="text"
@@ -837,13 +1203,70 @@ const exportPDF = () => {
                         }
                       />
                     </td>
-                    <td>{row.NDEResult}</td>
-                    <td>{row.NDEReport}</td>
+                                        <td
+                      onDrop={(e) => handleFileDrop(e, scope.id, row.id)}
+                      onDragOver={handleDragOver}
+                      style={{
+                        width: 80,
+                        height: 50,
+                        border: "1px dashed #999",
+                        textAlign: "center",
+                        verticalAlign: "middle",
+                        cursor: "pointer",
+                      }}
+                      title="Drag & drop image here"
+                    >
+                      {row.JointTypeImage ? (
+                        <img
+                          src={row.JointTypeImage}
+                          alt="Joint Type"
+                          style={{ maxWidth: "100%", maxHeight: "48px" }}
+                        />
+                      ) : (
+                        <div style={{ fontSize: 10, color: "#999", marginTop: 12 }}>
+                          Drop Image
+                        </div>
+                      )}
+                    </td>
+                                        <td>
+                      <AutoResizeTextarea
+                        value={row.Results}
+                        onChange={(e) =>
+                          updateWeldHistoryRowField(scope.id, row.id, "Results", e.target.value)
+                        }
+                      />
+                    </td>
+                                        <td>
+                      <AutoResizeTextarea
+                        value={row.ReportNo}
+                        onChange={(e) =>
+                          updateWeldHistoryRowField(scope.id, row.id, "ReportNo", e.target.value)
+                        }
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-
+<div style={{ marginTop: '20px' }}>
+  <h3>Weld Map</h3>
+  <ImageDropField
+    onImageChange={(file) => updateWeldMapImage(scope.id, file)}
+  />
+  <AutoResizeTextarea
+    value={scope.weldMapText}
+    onChange={(e) => updateWeldMapText(scope.id, e.target.value)}
+    placeholder="Enter Weld Map notes..."
+    style={{
+      width: '400px',
+      marginTop: '10px',
+      fontSize: '14px',
+      padding: '8px',
+      borderRadius: '6px',
+      border: '1px solid #ccc',
+    }}
+  />
+</div>
             {/* Supervisor Signature and Completion Date */}
             <div
               style={{
@@ -854,15 +1277,13 @@ const exportPDF = () => {
                 flexWrap: "wrap",
               }}
             >
-              <label>
-                Supervisor Signature:
-                <input
-                  type="text"
-                  value={supervisorSignature}
-                  onChange={(e) => setSupervisorSignature(e.target.value)}
-                  style={{ marginLeft: 10 }}
-                />
-              </label>
+<label>
+  Supervisor Signature:
+  <SupervisorSignatureInput
+    supervisorSignature={supervisorSignature}
+    setSupervisorSignature={setSupervisorSignature}
+  />
+</label>
               <label>
                 Final Completion Date:
                 <input
@@ -881,6 +1302,7 @@ const exportPDF = () => {
 }
 
 export default App;
+
 
 
 

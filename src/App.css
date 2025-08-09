@@ -4,6 +4,7 @@
   max-width: 100%;
   overflow-x: auto;
   position: relative;
+  font-size: 14px; /* unified font size here */
 }
 
 /* Logo styling */
@@ -22,37 +23,40 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 10px;
+  font-size: 14px; /* ensure table uses same font size */
+}
+
+th, td {
+  border: 1px solid #666;
+  padding: 6px;
+  text-align: center;
 }
 
 th {
   background-color: #c0c0c0; /* light grey */
   color: black;
-  padding: 6px;
-  border: 1px solid #666;
-  font-size: 14px;
-  text-align: center;
+  font-weight: bold;
+  vertical-align: middle; /* center vertically */
 }
 
 td {
   background-color: #dbe5f1; /* light blue */
-  border: 1px solid #999;
-  padding: 4px;
 }
 
-input, select {
+input, select, textarea {
   width: 100%;
   box-sizing: border-box;
   padding: 4px;
-  font-size: 13px;
+  font-size: 14px;
+  display: block;
+  border: 1px solid #999;
+  border-radius: 2px;
 }
+
 th div {
   line-height: 1.2;
 }
-
-body {
-  font-size: 14pt; /* default is usually 12pt */
-}
-
-table, input, select, button {
-  font-size: 14pt;
+table {
+  table-layout: fixed;
+  width: 100%;
 }
