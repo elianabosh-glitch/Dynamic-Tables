@@ -980,21 +980,21 @@ const handleDragOver = (e) => e.preventDefault();
               style={{ borderCollapse: "collapse", width: "100%", marginBottom: 5, tableLayout: "fixed" }}
             >
                <colgroup>
-    <col style={{ width: '80px' }} />
-    <col style={{ width: '80px' }} />
-    <col style={{ width: '110px' }} />{/* Date Column width */}
-    <col style={{ width: '100px' }} />{/* WPS No Column width */}
-    <col style={{ width: '120px' }} />{/* Welding Process Column width */}
-    <col style={{ width: '450px' }} />{/* Description Column width */}
-    <col style={{ width: '110px' }} />{/* Material Thickness Column width */}
-    <col style={{ width: '250px' }} />{/* Material type to Material Type column width */}
-    <col style={{ width: '100px' }} />
-    <col style={{ width: '80px' }} />
-    <col style={{ width: '100px' }} />
-    <col style={{ width: '80px' }} />
-    <col style={{ width: '110px' }} />
-    <col style={{ width: '100px' }} />
-    <col style={{ width: '150px' }} />{/* Report No col width */}
+    <col style={{ width: '8px' }} />
+    <col style={{ width: '8px' }} />
+    <col style={{ width: '11px' }} />{/* Date Column width */}
+    <col style={{ width: '10px' }} />{/* WPS No Column width */}
+    <col style={{ width: '12px' }} />{/* Welding Process Column width */}
+    <col style={{ width: '45px' }} />{/* Description Column width */}
+    <col style={{ width: '11px' }} />{/* Material Thickness Column width */}
+    <col style={{ width: '25px' }} />{/* Material type to Material Type column width */}
+    <col style={{ width: '10px' }} />
+    <col style={{ width: '8px' }} />
+    <col style={{ width: '10px' }} />
+    <col style={{ width: '8px' }} />
+    <col style={{ width: '11px' }} />
+    <col style={{ width: '10px' }} />
+    <col style={{ width: '15px' }} />{/* Report No col width */}
   </colgroup>
               <thead>
                 <tr>
@@ -1241,17 +1241,17 @@ const handleDragOver = (e) => e.preventDefault();
             <table
               border="1"
               cellPadding="5"
-              style={{ borderCollapse: "collapse", width: "100%" }}
+              style={{ borderCollapse: "collapse", width: "100%",tableLayout:"fixed" }}
             >
 <thead>
   <tr>
-    <th rowSpan={2} style={{ width: 60 }}>Weld No</th>
-    <th rowSpan={2} style={{ width: 70 }}>Welder ID</th>
-    <th rowSpan={2} style={{ width: 120 }}>Date</th>
-    <th rowSpan={2} style={{ width: 60 }}>WPS No</th>
+    <th rowSpan={2} style={{ width: '8px' }}>Weld No</th>
+    <th rowSpan={2} style={{ width: '8px' }}>Welder ID</th>
+    <th rowSpan={2} style={{ width: '11px' }}>Date</th>
+    <th rowSpan={2} style={{ width: '10px' }}>WPS No</th>
     <th
       rowSpan={2}
-      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '100px' }}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '12px' }}
     >
       <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
         Welding<br />Process
@@ -1259,7 +1259,7 @@ const handleDragOver = (e) => e.preventDefault();
     </th>
     <th
       rowSpan={2}
-      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '150px' }}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '14px' }}
     >
       <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
         Welder<br />Pass No
@@ -1267,7 +1267,7 @@ const handleDragOver = (e) => e.preventDefault();
     </th>
         <th
       rowSpan={2}
-      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '150px' }}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '17px' }}
     >
       <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
         Weld Joint<br />type
@@ -1275,7 +1275,7 @@ const handleDragOver = (e) => e.preventDefault();
     </th>
     <th
       rowSpan={2}
-      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '450px' }}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '50px' }}
     >
       <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
         Item to Item<br />Description
@@ -1283,13 +1283,13 @@ const handleDragOver = (e) => e.preventDefault();
     </th>
         <th
       rowSpan={2}
-      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '200px' }}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '22px' }}
     >
       <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
         Electrode<br />Batch No
       </div>
     </th>
-    <th rowSpan={2} style={{ width: 80 }}>Drawing No</th>
+    <th rowSpan={2} style={{ width: '9px' }}>Drawing No</th>
 
     {/* NDE grouped header spanning 7 columns */}
     <th colSpan={7} style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '16px' }}>
@@ -1298,13 +1298,13 @@ const handleDragOver = (e) => e.preventDefault();
   </tr>
   <tr>
     {/* NDE sub-headers */}
-    <th>Prep Checked By</th>
-    <th>Final Visual</th>
-    <th>Date</th>
-    <th>M.T./U.T.</th>
-    <th>Initials</th>
-    <th>Result</th>
-    <th>Report No</th>
+    <th rowSpan={2} style={{ width: '7px' }}>Prep Checked By</th>
+    <th rowSpan={2} style={{ width: '7px' }}>Final Visual</th>
+    <th rowSpan={2} style={{ width: '7px' }}>Date</th>
+    <th rowSpan={2} style={{ width: '7px' }}>M.T./U.T.</th>
+    <th rowSpan={2} style={{ width: '7px' }}>Initials</th>
+    <th rowSpan={2} style={{ width: '7px' }}>Result</th>
+    <th rowSpan={2} style={{ width: '7px' }}>Report No</th>
   </tr>
 </thead>
 
