@@ -4,8 +4,8 @@ import jsPDF from "jspdf";
 import logo from "./TMF icon.jpg";
 import React, { useState, useEffect, useRef} from 'react';
 function ImageDropField({ onImageChange, style }) {
-  const [dragActive, setDragActive] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [dragActive, setDragActive] = React.useState(false);
+  const [imagePreview, setImagePreview] = React.useState(null);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -37,21 +37,7 @@ function ImageDropField({ onImageChange, style }) {
     }
   };
 
-  const handleChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          setImagePreview(reader.result);
-          if (onImageChange) onImageChange(file);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert("Please select an image file.");
-      }
-    }
-  };
+  // Removed handleChange and file input because no select option anymore
 
   return (
     <div
@@ -62,7 +48,7 @@ function ImageDropField({ onImageChange, style }) {
       style={{
         border: dragActive ? "3px dashed #4A90E2" : "3px dashed #ccc",
         borderRadius: "12px",
-        width: "160px",
+        width: "100px",
         height: "50px",
         margin: "20px auto",
         display: "flex",
@@ -75,7 +61,6 @@ function ImageDropField({ onImageChange, style }) {
         userSelect: "none",
         ...style,
       }}
-      onClick={() => document.getElementById("imageUploadInput").click()}
     >
       {imagePreview ? (
         <img
@@ -84,44 +69,17 @@ function ImageDropField({ onImageChange, style }) {
           style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: "8px" }}
         />
       ) : (
-        <>
-          <p style={{ fontSize: "18px", color: "#666", textAlign: "center" }}>
-            Drop Image
-          </p>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              document.getElementById("imageUploadInput").click();
-            }}
-            style={{
-              padding: "8px 16px",
-              fontSize: "16px",
-              borderRadius: "6px",
-              border: "none",
-              backgroundColor: "#4A90E2",
-              color: "#fff",
-              cursor: "pointer",
-              marginTop: "10px",
-            }}
-          >
-            Select Image
-          </button>
-        </>
+        <p style={{ fontSize: "18px", color: "#666", textAlign: "center" }}>
+          Drop Image
+        </p>
       )}
-      <input
-        id="imageUploadInput"
-        type="file"
-        accept="image/*"
-        style={{ display: "none" }}
-        onChange={handleChange}
-      />
     </div>
   );
 }
-function ImageDropFieldWeldMap({ onImageChange, style }) {
-  const [dragActive, setDragActive] = useState(false);
-  const [imagePreview, setImagePreview] = useState(null);
+
+function ImageDropFieldWeldMap({ onImageChange, style, inputId }) {
+  const [dragActive, setDragActive] = React.useState(false);
+  const [imagePreview, setImagePreview] = React.useState(null);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -153,21 +111,7 @@ function ImageDropFieldWeldMap({ onImageChange, style }) {
     }
   };
 
-  const handleChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          setImagePreview(reader.result);
-          if (onImageChange) onImageChange(file);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert("Please select an image file.");
-      }
-    }
-  };
+  // Remove handleChange and file input so no "select image" is possible
 
   return (
     <div
@@ -178,8 +122,8 @@ function ImageDropFieldWeldMap({ onImageChange, style }) {
       style={{
         border: dragActive ? "3px dashed #4A90E2" : "3px dashed #ccc",
         borderRadius: "12px",
-        width: "2000px",
-        height: "500px",
+        width: "800px",
+        height: "800px",
         margin: "20px auto",
         display: "flex",
         alignItems: "center",
@@ -191,52 +135,29 @@ function ImageDropFieldWeldMap({ onImageChange, style }) {
         userSelect: "none",
         ...style,
       }}
-      onClick={() => document.getElementById("imageUploadInput").click()}
     >
       {imagePreview ? (
         <img
           src={imagePreview}
           alt="Preview"
-          style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: "8px" }}
+          style={{
+            width: "250px",
+            height: "180px",
+            objectFit: "contain",
+            borderRadius: "8px",
+          }}
         />
       ) : (
-        <>
-          <p style={{ fontSize: "18px", color: "#666", textAlign: "center" }}>
-            Drop Image
-          </p>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              document.getElementById("imageUploadInput").click();
-            }}
-            style={{
-              padding: "8px 16px",
-              fontSize: "16px",
-              borderRadius: "6px",
-              border: "none",
-              backgroundColor: "#4A90E2",
-              color: "#fff",
-              cursor: "pointer",
-              marginTop: "10px",
-            }}
-          >
-            Select Image
-          </button>
-        </>
+        <p style={{ fontSize: "18px", color: "#666", textAlign: "center" }}>
+          Drop Image
+        </p>
       )}
-      <input
-        id="imageUploadInput"
-        type="file"
-        accept="image/*"
-        style={{ display: "none" }}
-        onChange={handleChange}
-      />
     </div>
   );
 }
 
-function AutoResizeTextarea({ value, onChange }) {
+
+function AutoResizeTextarea({ value, onChange, style }) {
   const textareaRef = useRef(null);
   useEffect(() => {
     if (textareaRef.current) {
@@ -257,6 +178,7 @@ function AutoResizeTextarea({ value, onChange }) {
         resize: 'none',
         overflow: 'hidden',
         overflowWrap: 'break-word',
+        ...style,
       }}
     />
   );
@@ -316,10 +238,39 @@ function SupervisorSignatureInput({ supervisorSignature, setSupervisorSignature 
   );
 }
 function App() {
+const [columnName, setColumnName] = React.useState("M.T./U.T.");
 const handleImageChange = (file) => {
     console.log('Selected image file:', file);
     // You can save file or preview URL to state here if needed
   };
+
+//Handle Second Weld Map
+const [weldMapImages, setWeldMapImages] = React.useState({});
+const [secondImages, setSecondImages] = React.useState({});
+
+function updateWeldMapImage(scopeId, file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    setWeldMapImages(prev => ({
+      ...prev,
+      [scopeId]: reader.result, // store image data URL keyed by scopeId
+    }));
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateSecondImage(scopeId, file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    setSecondImages(prev => ({
+      ...prev,
+      [scopeId]: reader.result, // store image data URL keyed by scopeId
+    }));
+  };
+  reader.readAsDataURL(file);
+}
+// state object: { [scopeId]: base64ImageData }
+
 const [scopeDescription, setScopeDescription] = useState('');
 const exportPDF = () => {
   const input = document.getElementById("exportable-area");
@@ -368,13 +319,8 @@ const exportPDF = () => {
   const passNoOptions = ["1", "2", "3", "4", "5"];
   const materialThicknessOptions = [...Array(24)].map((_, i) => `${i + 2} mm`,"Other");
   const materialTypeOptions = [
-    "Grade 250 to Grade 250", "Grade 250 to Grade 350", "Grade 350 to Grade 350",
-    "Grade 350 to Grade 700", "Grade 350 to AISI/SAE 1020", "Grade 350 to AISI/SAE 1040",
-    "Grade 350 to AISI/SAE 20MnV6", "Grade 700 to Grade 700", "ASTM A105 to ASTM A105",
-    "ASTM A105 to ASTM A106 Gr.B", "ASTM A106 Gr.B to ASTM A106", "ASTM A105 to AISI 4130",
-    "ASTM A106 Gr.B to AISI 4130", "AISI 4130 to AISI 4130", "Grade 350 to AISI 4130",
-    "AISI/SAE 1020 to AISI/SAE 4130", "AISI/SAE 1040 to AISI/SAE 4130", "AISI/SAE 1045 to AISI/SAE 4130",
-    "Other"
+    "Grade 250", "Grade 350", "Grade 700", "AISI/SAE 1020", "AISI/SAE 1040","AISI/SAE 20MnV6", "ASTM A105","ASTM A106 Gr.B", "ASTM A106", "AISI 4130",
+    "AISI/SAE 1020", "AISI/SAE 1045","Other"
   ];
 
   // Create empty rows
@@ -395,7 +341,7 @@ const exportPDF = () => {
     id: generateId(),
     WeldNo: "",
     WelderId: "",
-    Date: "",
+    Welddate: "",
     WeldingProcedureSpecificationNo: "",
     WeldingProcess: "",
     Welder: "",
@@ -416,7 +362,7 @@ const exportPDF = () => {
     id: generateId(),
     WeldNo: "",
     WelderId: "",
-    WeldHistoryDate: "",
+    Welddate: "",
     WeldingProcedureSpecificationNo: "",
     Welder: "",
     PassNo: "",
@@ -549,7 +495,7 @@ const addScope = () => {
 
 
 //Handlers for Weld map
-const updateWeldMapImage = (scopeId, file) => {
+const updateWeldMapImageInScopes = (scopeId, file) => {
   setScopes((prev) =>
     prev.map((scope) =>
       scope.id === scopeId ? { ...scope, weldMapImage: file } : scope
@@ -607,11 +553,14 @@ const updateRowField = (scopeId, rowId, field, value) => {
         const syncFields = [
           "WeldNo",
           "WelderId",
+          "Welddate",
           "WeldingProcedureSpecificationNo",
           "WeldingProcess",
           "Welder",
           "PassNo",
           "JointTypeImage",
+          "NDEReportdate",
+          "NDEReportNo",
         ];
         if (syncFields.includes(field)) {
           whRow[field] = value;
@@ -679,6 +628,19 @@ const createEmptyMaterialRow = () => ({
         };
       }
       return scope;
+    })
+  );
+}
+
+  // Add Material Register Rows
+
+function deleteMaterialRow(scopeId) {
+  setScopes((prevScopes) =>
+    prevScopes.map((scope) => {
+      if (scope.id !== scopeId) return scope;
+      // Remove last row or you can pass specific row id if you want
+      const updatedRows = scope.materialRows.slice(0, -1);
+      return { ...scope, materialRows: updatedRows };
     })
   );
 }
@@ -828,59 +790,94 @@ const handleDragOver = (e) => e.preventDefault();
 
 <div style={{ marginBottom: 20 }}>
 </div>
-      <div id="exportable-area">
-        {scopes.map((scope, sIdx) => (
-          <div
-            key={scope.id}
-            style={{
-              border: "1px solid black",
-              padding: 15,
-              marginBottom: 40,
-            }}
-          >
-            <h2>Scope {sIdx + 1}</h2>
-            {/* Material Certificate Register */}
-            <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
-  <h3 style={{ margin: 0, marginRight: 16 }}>Material Certificate Register</h3>
-  
-  <label htmlFor="scopeDescription" style={{ fontWeight: 'bold', marginRight: 8, whiteSpace: 'nowrap' }}>
-    Scope Description
-  </label>
- <AutoResizeTextarea
-  id={`scopeDescription-${scope.id}`}
-  value={scope.scopeDescription || ""}
-  onChange={(e) => updateScopeDescription(scope.id, e.target.value)}
-  style={{ padding: 8, fontSize: 14, boxSizing: 'border-box', width: '250px' }}
-  placeholder="Enter scope description"
-/>
-</div>
+<div id="exportable-area">
+  {scopes.map((scope, sIdx) => (
+    <div
+      key={scope.id}
+      style={{
+        border: "1px solid black",
+        padding: 15,
+        marginBottom: 40,
+        whiteSpace: 'nowrap'
+      }}
+    >
+      {/* Scope heading and description on same row */}
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+        <h2 style={{ fontSize: '2em', margin: 0, marginRight: 120 }}>
+          Scope {sIdx + 1}     
+        </h2>
+        <label
+          htmlFor={`scopeDescription-${scope.id}`}
+          style={{
+            fontWeight: 'bold',
+            fontSize: '2em',
+            marginRight: 8,
+            whiteSpace: 'nowrap'
+          }}
+        >
+         Scope Description
+        </label>
+        <AutoResizeTextarea
+          id={`scopeDescription-${scope.id}`}
+          value={scope.scopeDescription || ""}
+          onChange={(e) => updateScopeDescription(scope.id, e.target.value)}
+          style={{
+            padding: 8,
+            fontSize: '1.8em',
+            boxSizing: 'border-box',
+            flex: 1,
+            minWidth: '300px'
+          }}
+          placeholder="Enter scope description"
+        />
+      </div>
+
+      {/* Material Certificate Register title */}
+      <h3 style={{ margin: 0, marginBottom: 8 }}>
+        Material Certificate Register
+      </h3>
             <table
               border="1"
               cellPadding="5"
-              style={{ borderCollapse: "collapse", width: "100%", marginBottom: 20 }}
+  style={{
+    borderCollapse: "collapse",
+    width: "100%",
+    marginBottom: 20,
+    tableLayout: "fixed",  // <--- this enforces column widths strictly
+  }}
             >
+  <colgroup> {/* Set column widths here */}
+    <col style={{ width: '20px' }} /> 
+    <col style={{ width: '20px' }} />
+    <col style={{ width: '20px' }} />
+    <col style={{ width: '20px' }} />
+    <col style={{ width: '80px' }} />
+    <col style={{ width: '20px' }} />
+    <col style={{ width: '20px' }} />
+  </colgroup>
+
               <thead>
                 <tr>
-                  <th>Material Supplier</th>
-                  <th>Material Certification No</th>
-                  <th>Batch No</th>
-                  <th>Serial/Heat No</th>
-                  <th>Description</th>
-                  <th>Material Grade</th>
-                  <th>In Service Date</th>
+                  <th >Material Supplier</th>
+                  <th >Material Certification No</th>
+                  <th >Batch No</th>
+                  <th >Serial/Heat No</th>
+                  <th >Description</th>
+                  <th >Material Grade</th>
+                  <th >In Service Date</th>
                 </tr>
               </thead>
               <tbody>
                 {scope.materialRows.map((row) => (
                   <tr key={row.id}>
-                    <td>
+                    <td  style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 <AutoResizeTextarea 
   value={row.supplier}
   onChange={(e) =>
                           updateMaterialRowField(scope.id, row.id, "supplier", e.target.value)
                         }
   rows={3}       // sets visible height
-  style={{ whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box',    resize: 'none',            // optional: prevent manual resize
+  style={{ textAlign: 'center', whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box',    resize: 'none',            // optional: prevent manual resize
     overflowWrap: 'break-word' // wrap long words if needed
     }} // wrap + allow resize
 />
@@ -892,7 +889,7 @@ const handleDragOver = (e) => e.preventDefault();
                           updateMaterialRowField(scope.id, row.id, "certNo", e.target.value)
                         }
                           rows={3}       // sets visible height
-  style={{ whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
+  style={{ textAlign: 'center', whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
                       />
                     </td>
                     <td>
@@ -902,7 +899,7 @@ const handleDragOver = (e) => e.preventDefault();
                           updateMaterialRowField(scope.id, row.id, "batchNo", e.target.value)
                         }
                       rows={3}       // sets visible height
-  style={{ whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
+  style={{ textAlign: 'center', whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
   />
                     </td>
                     <td>
@@ -911,6 +908,8 @@ const handleDragOver = (e) => e.preventDefault();
                         onChange={(e) =>
                           updateMaterialRowField(scope.id, row.id, "serialNo", e.target.value)
                         }
+                        rows={3}
+                        style={{ textAlign: 'center', whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
                       />
                     </td>
                     <td>
@@ -919,10 +918,13 @@ const handleDragOver = (e) => e.preventDefault();
                         onChange={(e) =>
                           updateMaterialRowField(scope.id, row.id, "description", e.target.value)
                         }
+                        rows={3}
+                        style={{ textAlign: 'center', whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
                       />
                     </td>
                     <td>
                       <select
+                      style={{ textAlign: 'center'}}
                         value={row.grade}
                         onChange={(e) =>
                           updateMaterialRowField(scope.id, row.id, "grade", e.target.value)
@@ -952,42 +954,88 @@ const handleDragOver = (e) => e.preventDefault();
     onChange={(e) =>
       updateMaterialRowField(scope.id, row.id, "inServiceDate", e.target.value)
     }
-    style={{ width: '100%', boxSizing: 'border-box' }}
+    style={{ textAlign: 'center', width: '100%', boxSizing: 'border-box' }}
   />
 </td>
                   </tr>
                 ))}
               </tbody>
-{/* Add Row Button */}
-<div style={{ marginBottom: 20 }}>
-  <button onClick={() => addMaterialRow(scope.id)}>Add Row</button>
-</div>
             </table>
 
+{/* Add & Delete Row Buttons */}
+<div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+  <div>
+    <button onClick={() => addMaterialRow(scope.id)}>Add Row</button>
+  </div>
+  <div>
+    <button onClick={() => deleteMaterialRow(scope.id)}>Delete Row</button>
+  </div>
+</div>
             {/* Test Request */}
             <h3>Test Request</h3>
+            
             <table
               border="1"
               cellPadding="5"
-              style={{ borderCollapse: "collapse", width: "100%", marginBottom: 5 }}
+              style={{ borderCollapse: "collapse", width: "100%", marginBottom: 5, tableLayout: "fixed" }}
             >
+               <colgroup>
+    <col style={{ width: '80px' }} />
+    <col style={{ width: '80px' }} />
+    <col style={{ width: '110px' }} />{/* Date Column width */}
+    <col style={{ width: '100px' }} />{/* WPS No Column width */}
+    <col style={{ width: '120px' }} />{/* Welding Process Column width */}
+    <col style={{ width: '450px' }} />{/* Description Column width */}
+    <col style={{ width: '110px' }} />{/* Material Thickness Column width */}
+    <col style={{ width: '250px' }} />{/* Material type to Material Type column width */}
+    <col style={{ width: '100px' }} />
+    <col style={{ width: '80px' }} />
+    <col style={{ width: '100px' }} />
+    <col style={{ width: '80px' }} />
+    <col style={{ width: '110px' }} />
+    <col style={{ width: '100px' }} />
+    <col style={{ width: '150px' }} />{/* Report No col width */}
+  </colgroup>
               <thead>
                 <tr>
-                  <th colSpan={7}>Weld Details</th>
+                  <th colSpan={8}>Weld Details</th>
                   <th colSpan={4}>NDE Method</th>
                   <th colSpan={3}>NDE Report</th>
                   </tr>
                   <tr>
-                  <th>Welder ID</th>
-                  <th>Weld No</th>
-                  <th>WPS No</th>
-                  <th>Welding Process</th>
+                  <th rowSpan={2} style={{ width: 60 }}>Weld No</th>
+    <th rowSpan={2} style={{ width: 70 }}>Welder ID</th>
+    <th rowSpan={2} style={{ width: 120 }}>Date</th>
+    <th rowSpan={2} style={{ width: 60 }}>WPS No</th>
+    <th
+      rowSpan={2}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '100px' }}
+    >
+      <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
+        Welding<br />Process
+      </div>
+    </th>
                   <th>Description</th>
                   <th>Material Thickness</th>
                   <th>Material Type to Material Type</th>
                   <th>Visual</th>
                   <th>Initial</th>
-                  <th>M.T./U.T.</th>
+                  <th style={{ textAlign: 'center', width: '80px' }}>
+  <input
+    type="text"
+    value={columnName}             // state variable holding the column name
+    onChange={(e) => setColumnName(e.target.value)}  // update state on change
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      textAlign: 'center',
+      fontWeight: 'bold',
+      border: 'none',
+      background: 'transparent',
+      cursor: 'text',
+    }}
+  />
+</th>
                   <th>Initial</th>
                   <th>Date</th>
                   <th>Results</th>
@@ -997,21 +1045,7 @@ const handleDragOver = (e) => e.preventDefault();
               <tbody>
                 {scope.traceabilityRows.map((row) => (
                   <tr key={row.id}>
-                    <td>
-                      <select
-                        value={row.WelderId}
-                        onChange={(e) =>
-                          updateRowField(scope.id, row.id, "WelderId", e.target.value)
-                        }
-                      >
-                        <option value="">Select</option>
-                        {welderIdOptions.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
+                  
                     <td>
                       <select
                         value={row.WeldNo}
@@ -1027,6 +1061,31 @@ const handleDragOver = (e) => e.preventDefault();
                         ))}
                       </select>
                     </td>
+                    <td>
+                      <select
+                        value={row.WelderId}
+                        onChange={(e) =>
+                          updateRowField(scope.id, row.id, "WelderId", e.target.value)
+                        }
+                      >
+                        <option value="">Select</option>
+                        {welderIdOptions.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                                        <td>
+                    <input
+                        type="date"
+                        value={row.Welddate || ''}
+                        onChange={(e) =>
+                        updateRowField(scope.id, row.id, "Welddate", e.target.value)
+                           }
+                           style={{ width: '100%', boxSizing: 'border-box'}}
+                         />
+                       </td>
                     <td>
                       <select
                         value={row.WeldingProcedureSpecificationNo}
@@ -1144,9 +1203,9 @@ const handleDragOver = (e) => e.preventDefault();
                     <td>
                     <input
                         type="date"
-                        value={row.NDEreportdate || ''}
+                        value={row.NDEReportdate || ''}
                         onChange={(e) =>
-                        updateRowField(scope.id, row.id, "NDEreportdate", e.target.value)
+                        updateRowField(scope.id, row.id, "NDEReportdate", e.target.value)
                            }
                            style={{ width: '100%', boxSizing: 'border-box'}}
                          />
@@ -1161,9 +1220,9 @@ const handleDragOver = (e) => e.preventDefault();
                     </td>
                     <td>
                       <AutoResizeTextarea
-                        value={row.ReportNo}
+                        value={row.NDEReportNo}
                         onChange={(e) =>
-                          updateRowField(scope.id, row.id, "ReportNo", e.target.value)
+                          updateRowField(scope.id, row.id, "NDEReportNo", e.target.value)
                         }
                       />
                     </td>
@@ -1187,10 +1246,17 @@ const handleDragOver = (e) => e.preventDefault();
 <thead>
   <tr>
     <th rowSpan={2} style={{ width: 60 }}>Weld No</th>
-    <th rowSpan={2} style={{ width: 60 }}>Welder ID</th>
+    <th rowSpan={2} style={{ width: 70 }}>Welder ID</th>
     <th rowSpan={2} style={{ width: 120 }}>Date</th>
     <th rowSpan={2} style={{ width: 60 }}>WPS No</th>
-    <th rowSpan={2} style={{ width: 60 }}>Welding Process</th>
+    <th
+      rowSpan={2}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '100px' }}
+    >
+      <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
+        Welding<br />Process
+      </div>
+    </th>
     <th
       rowSpan={2}
       style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '150px' }}
@@ -1199,16 +1265,31 @@ const handleDragOver = (e) => e.preventDefault();
         Welder<br />Pass No
       </div>
     </th>
-    <th rowSpan={2} style={{ width: 100 }}>Weld Joint Type</th>
+        <th
+      rowSpan={2}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '150px' }}
+    >
+      <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
+        Weld Joint<br />type
+      </div>
+    </th>
     <th
       rowSpan={2}
-      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '550px' }}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '450px' }}
     >
       <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
         Item to Item<br />Description
       </div>
     </th>
-    <th rowSpan={2} style={{ width: 110 }}>Electrode Batch No</th>
+        <th
+      rowSpan={2}
+      style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '200px' }}
+    >
+      <div style={{ lineHeight: 'normal', fontWeight: 'bold', fontSize: '14px' }}>
+        Electrode<br />Batch No
+      </div>
+    </th>
+    <th rowSpan={2} style={{ width: 80 }}>Drawing No</th>
 
     {/* NDE grouped header spanning 7 columns */}
     <th colSpan={7} style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '16px' }}>
@@ -1232,22 +1313,12 @@ const handleDragOver = (e) => e.preventDefault();
  <tbody>
   {scope.weldHistoryRows.map((row) => (
     <tr key={row.id}>
-      <td style={{ width: 60 }}>{row.WeldNo}</td>
-      <td style={{ width: 60 }}>{row.WelderId}</td>
-      <td style={{ width: 100 }}>
-  <input
-    type="date"
-    value={row.WeldHistoryDate || ''}
-    onChange={(e) =>
-      updateMaterialRowField(scope.id, row.id, "WeldHistoryDate", e.target.value)
-    }
-    style={{ width: '100%', boxSizing: 'border-box' }}
-  />
-</td>
-
-      <td style={{ width: 60 }}>{row.WeldingProcedureSpecificationNo}</td>
-      <td style={{ width: 60 }}>{row.WeldingProcess}</td>
-                     <td style={{ width: 40 }}><select
+      <td style={{ textAlign: 'center', width: 60 }}>{row.WeldNo}</td>
+      <td style={{ textAlign: 'center', width: 60 }}>{row.WelderId}</td>
+      <td style={{ textAlign: 'center', width: 100 }}>{row.Welddate}</td>
+      <td style={{ textAlign: 'center', width: 60 }}>{row.WeldingProcedureSpecificationNo}</td>
+      <td style={{ textAlign: 'center', width: 60 }}>{row.WeldingProcess}</td>
+                     <td style={{ textAlign: 'center', width: 40 }}><select
                         value={row.welderNames}
                         onChange={(e) =>
                           updateRowField(scope.id, row.id, "welderNames", e.target.value)
@@ -1260,22 +1331,13 @@ const handleDragOver = (e) => e.preventDefault();
                           </option>
                         ))}
                       </select>
-  <select
+ <AutoResizeTextarea
     value={row.PassNoOptions}
-    onChange={(e) =>
-      updateRowField(scope.id, row.id, "PassNo", e.target.value)
-    }
-    style={{ width: '100%' }}
-  >
-    <option value="">Select Pass No</option>
-    {passNoOptions.map((opt) => (
-      <option key={opt} value={opt}>
-        {opt}
-      </option>
-    ))}
-  </select>
+    onChange={(e) => updateRowField(scope.id, row.id, 'PassNoOptions', e.target.value)}
+    placeholder="PassNo"
+  />
                     </td>
-                    <td style={{ width: 15, height: 50, verticalAlign: "middle" }}>
+                    <td style={{ textAlign: 'center', width: 15, height: 50, verticalAlign: "middle" }}>
   <ImageDropField
     onImageChange={(file) => {
       const reader = new FileReader();
@@ -1286,7 +1348,7 @@ const handleDragOver = (e) => e.preventDefault();
     }}
   />
 </td>
-<td style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+<td style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '6px' }}>
   <AutoResizeTextarea
     value={row.itemToItem}
     onChange={(e) => updateRowField(scope.id, row.id, 'itemToItem', e.target.value)}
@@ -1298,11 +1360,19 @@ const handleDragOver = (e) => e.preventDefault();
     placeholder="Description"
   />
 </td>
-                    <td>
+<td>
                       <AutoResizeTextarea
                         value={row.ElectrodeBatchNo}
                         onChange={(e) =>
                           updateWeldHistoryRowField(scope.id, row.id, "Electrode Batch No", e.target.value)
+                        }
+                      />
+                    </td>
+                    <td>
+                      <AutoResizeTextarea
+                        value={row.DrawingNo}
+                        onChange={(e) =>
+                          updateWeldHistoryRowField(scope.id, row.id, "Drawing No", e.target.value)
                         }
                       />
                     </td>
@@ -1322,16 +1392,7 @@ const handleDragOver = (e) => e.preventDefault();
                         }
                       />
                     </td>
-                    <td>
-  <input
-    type="date"
-    value={row.inServiceDate || ''}
-    onChange={(e) =>
-      updateMaterialRowField(scope.id, row.id, "inServiceDate", e.target.value)
-    }
-    style={{ width: '100%', boxSizing: 'border-box' }}
-  />
-</td>
+                    <td style={{ textAlign: 'center', width: 100 }}>{row.NDEReportdate}</td>
 <td>
                       <input
                         type="text"
@@ -1341,7 +1402,7 @@ const handleDragOver = (e) => e.preventDefault();
                         }
                       />
                     </td>
-                                        <td style={{ width: 15, height: 50, verticalAlign: "middle" }}>
+                                        <td style={{ textAlign: 'center', width: 15, height: 50, verticalAlign: "middle" }}>
   <ImageDropField
     onImageChange={(file) => {
       const reader = new FileReader();
@@ -1360,37 +1421,93 @@ const handleDragOver = (e) => e.preventDefault();
                         }
                       />
                     </td>
-                                        <td>
-                      <AutoResizeTextarea
-                        value={row.ReportNo}
-                        onChange={(e) =>
-                          updateWeldHistoryRowField(scope.id, row.id, "ReportNo", e.target.value)
-                        }
-                      />
-                    </td>
+                      <td style={{ textAlign: 'center', width: 100 }}>{row.NDEReportNo}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
 <div style={{ marginTop: '20px' }}>
-  <h3>Weld Map</h3>
-  <ImageDropFieldWeldMap
-    onImageChange={(file) => updateWeldMapImage(scope.id, file)}
-  />
+  <h3>Weld Map and Another Image</h3>
+  <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
+    <div>
+      <h4>Drop Field 1</h4>
+      <ImageDropFieldWeldMap
+        inputId="weldMapInput"
+        onImageChange={(file) => updateWeldMapImage(scope.id, file)}
+      />
+      {weldMapImages[scope.id] && (
+        <img
+          src={weldMapImages[scope.id]}
+          alt="Weld Map Preview"
+          style={{ width: 280, height: 180, objectFit: 'contain', marginTop: 10, borderRadius: 8 }}
+        />
+      )}
+    </div>
+    <div>
+      <h4>Drop Field 2</h4>
+      <ImageDropFieldWeldMap
+        inputId="secondImageInput"
+        onImageChange={(file) => updateSecondImage(scope.id, file)}
+      />
+      {secondImages[scope.id] && (
+        <img
+          src={secondImages[scope.id]}
+          alt="Second Image Preview"
+          style={{ width: 550, height: 280, objectFit: 'contain', marginTop: 10, borderRadius: 8 }}
+        />
+      )}
+    </div>
+  </div>
+
+<div
+  style={{
+    display: 'grid',
+    gridTemplateColumns: '300pt 800px 20px 800px',
+    columnGap: '20px',
+    marginTop: '10px',
+    alignItems: 'start',
+  }}
+>
+  {/* Empty grid cell for spacing */}
+  <div></div>
+
+  {/* First text area */}
   <AutoResizeTextarea
     value={scope.weldMapText}
     onChange={(e) => updateWeldMapText(scope.id, e.target.value)}
     placeholder="Enter Weld Map notes..."
     style={{
-      width: '400px',
-      marginTop: '10px',
+      width: '800px',
       fontSize: '14px',
       padding: '8px',
       borderRadius: '6px',
       border: '1px solid #ccc',
+      resize: 'vertical',
+    }}
+  />
+
+  {/* Spacer column between textboxes */}
+  <div></div>
+
+  {/* Second text area */}
+  <AutoResizeTextarea
+    value={scope.weldMapText}
+    onChange={(e) => updateWeldMapText(scope.id, e.target.value)}
+    placeholder="Enter Weld Map notes..."
+    style={{
+      width: '800px',
+      fontSize: '14px',
+      padding: '8px',
+      borderRadius: '6px',
+      border: '1px solid #ccc',
+      resize: 'vertical',
     }}
   />
 </div>
+
+</div>
+
+
             {/* Supervisor Signature and Completion Date */}
             <div
               style={{
