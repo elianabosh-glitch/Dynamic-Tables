@@ -273,7 +273,7 @@ function updateSecondImage(scopeId, file) {
 
 const [scopeDescription, setScopeDescription] = useState('');
 const exportPDF = () => {
-  const input = document.getElementById("exportable-area");
+  const input = document.querySelector(".App");
   if (!input) {
     alert("Export area not found");
     return;
@@ -396,27 +396,6 @@ const exportPDF = () => {
     scope.id === scopeId ? { ...scope, scopeDescription: newDescription } : scope
   ));
 };
-
-// Load saved data on app start
-useEffect(() => {
-  const stored = localStorage.getItem("weldAppData");
-  console.log("Loaded data from localStorage:", stored);
-  if (stored) {
-    const parsed = JSON.parse(stored);
-    if (parsed.scopes) setScopes(parsed.scopes);
-    if (parsed.projectInfo) setProjectInfo(parsed.projectInfo);
-  }
-}, []);
-
-// Save data whenever scopes or projectInfo change
-useEffect(() => {
-  const data = {
-    scopes,
-    projectInfo,
-  };
-  console.log("Saving data to localStorage:", data);
-  localStorage.setItem("weldAppData", JSON.stringify(data));
-}, [scopes, projectInfo]);
 
 // Code to load JSON file and set state
 const loadData = (e) => {
@@ -662,7 +641,8 @@ const handleDragOver = (e) => e.preventDefault();
   // Save and trigger download
 ;
   return (
-  
+    // Tells PDF export which area is "App" so it knows what to print
+  <div className="App">
     <div style={{ fontSize: "12pt", padding: 20 }}>
       <img src={logo} alt="logo" style={{ width: 200, marginBottom: 10 }} />
       <h1 style={{ lineHeight: 1.4 }}>Project Report </h1>
@@ -1463,7 +1443,7 @@ const handleDragOver = (e) => e.preventDefault();
   style={{
     display: 'grid',
     gridTemplateColumns: '300pt 800px 20px 800px',
-    columnGap: '20px',
+    columnGap: '10px',
     marginTop: '10px',
     alignItems: 'start',
   }}
@@ -1538,6 +1518,7 @@ const handleDragOver = (e) => e.preventDefault();
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }
