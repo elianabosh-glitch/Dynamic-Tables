@@ -79,3 +79,10 @@ th, td {
   min-width: unset !important;
   max-width: unset !important;
 }
+table td {
+  padding: 2px; /* or whatever value */
+  vertical-align: middle;
+}
+table {
+  border-collapse: collapse;
+}

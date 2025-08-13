@@ -244,6 +244,18 @@ const handleImageChange = (file) => {
     // You can save file or preview URL to state here if needed
   };
 
+// To update MTUT from input in Test Request to Weld History
+const updateScopeField = (scopeId, fieldName, value) => {
+  setScopes((prevScopes) =>
+    prevScopes.map((scope) =>
+      scope.id === scopeId
+        ? { ...scope, [fieldName]: value } // update the field in that scope
+        : scope
+    )
+  );
+};
+
+
 //Handle Second Weld Map
 const [weldMapImages, setWeldMapImages] = React.useState({});
 const [secondImages, setSecondImages] = React.useState({});
@@ -472,6 +484,28 @@ const addScope = () => {
   ]);
 };
 
+const deleteLastScope = () => {
+  if (scopes.length > 1) {
+    setScopes((prev) => prev.slice(0, -1));
+  }
+};
+
+
+// Delete Traceability and Weld History row
+const deleteTracandWeldHisRow = (scopeId) => {
+  setScopes((prevScopes) =>
+    prevScopes.map((scope) => {
+      if (scope.id === scopeId) {
+        return {
+          ...scope,
+          traceabilityRows: scope.traceabilityRows.slice(0, -1),
+          weldHistoryRows: scope.weldHistoryRows.slice(0, -1),
+        };
+      }
+      return scope;
+    })
+  );
+};
 
 //Handlers for Weld map
 const updateWeldMapImageInScopes = (scopeId, file) => {
@@ -611,7 +645,7 @@ const createEmptyMaterialRow = () => ({
   );
 }
 
-  // Add Material Register Rows
+  // Delete Material Register Rows
 
 function deleteMaterialRow(scopeId) {
   setScopes((prevScopes) =>
@@ -760,13 +794,30 @@ const handleDragOver = (e) => e.preventDefault();
   </label>
 </div>
 
+{/* Scope Controls Row */}
+<div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
+  {/* Add Scope and Export PDF Left side buttons */}
+  <div>
+    <button onClick={addScope} style={{ marginRight: 10 }}>
+      Add Scope
+    </button>
+    <button onClick={exportPDF}>
+      Export to PDF
+    </button>
+  </div>
 
-      <div style={{ marginBottom: 20 }}>
-        <button onClick={addScope} style={{ marginRight: 10 }}>
-          Add Scope
-        </button>
-        <button onClick={ exportPDF}>Export to PDF</button>
-      </div>
+  {/* Spacer to push delete button to far right */}
+  <div style={{ flex: 1 }}></div>
+
+  {/* Delete Last Scope Right side button */}
+  <button
+    onClick={deleteLastScope}
+    disabled={scopes.length === 0}
+  >
+    Delete Last Scope
+  </button>
+</div>
+
 
 <div style={{ marginBottom: 20 }}>
 </div>
@@ -928,18 +979,25 @@ const handleDragOver = (e) => e.preventDefault();
                       )}
                     </td>
 <td>
-  <input
-    type="date"
-    value={row.inServiceDate || ''}
-    onChange={(e) =>
-      updateMaterialRowField(scope.id, row.id, "inServiceDate", e.target.value)
-    }
-    style={{ textAlign: 'center', width: '100%', boxSizing: 'border-box' }}
-  />
+<input
+  type="date"
+  value={row.inServiceDate || ''}
+  onChange={(e) =>
+    updateMaterialRowField(scope.id, row.id, "inServiceDate", e.target.value)
+  }
+    style={{
+    textAlign: 'center',
+    width: '100%',
+    boxSizing: 'border-box',
+    height: '28px' // match other inputs
+  }}
+/>
+
 </td>
                   </tr>
                 ))}
               </tbody>
+            
             </table>
 
 {/* Add & Delete Row Buttons */}
@@ -1001,20 +1059,23 @@ const handleDragOver = (e) => e.preventDefault();
                   <th>Visual</th>
                   <th>Initial</th>
                   <th style={{ textAlign: 'center', width: '80px' }}>
-  <input
-    type="text"
-    value={columnName}             // state variable holding the column name
-    onChange={(e) => setColumnName(e.target.value)}  // update state on change
-    style={{
-      width: '100%',
-      boxSizing: 'border-box',
-      textAlign: 'center',
-      fontWeight: 'bold',
-      border: 'none',
-      background: 'transparent',
-      cursor: 'text',
-    }}
-  />
+<input
+  type="text"
+  value={scope.mtutHeader || ""}
+  onChange={(e) =>
+    updateScopeField(scope.id, "mtutHeader", e.target.value)
+  }
+  style={{
+    width: "100%",
+    boxSizing: "border-box",
+    textAlign: "center",
+    fontWeight: "bold",
+    border: "none",
+    background: "transparent",
+    cursor: "text",
+  }}
+/>
+
 </th>
                   <th>Initial</th>
                   <th>Date</th>
@@ -1159,15 +1220,19 @@ const handleDragOver = (e) => e.preventDefault();
   />
 </td>
 
+{/* Change MTUT header by user input and update Weld History MTUT header with same input */}
+<td>
+  <AutoResizeTextarea
+    value={row.MTUT}
+onChange={(e) => {
+  const value = e.target.value;
+  updateRowField(scope.id, row.id, "MTUT", value);
+  updateScopeField(scope.id, "mtutHeader", value); // new helper to update scope-level state
+}}
+  />
+</td>
 
-                    <td>
-                      <AutoResizeTextarea
-                        value={row.MTUT}
-                        onChange={(e) =>
-                          updateRowField(scope.id, row.id, "MTUT", e.target.value)
-                        }
-                      />
-                    </td>
+
                     <td style={{ width: 15, height: 50, verticalAlign: "middle" }}>
   <ImageDropField
     onImageChange={(file) => {
@@ -1211,10 +1276,27 @@ const handleDragOver = (e) => e.preventDefault();
               </tbody>
             </table>
 
-            {/* Add Row Button (adds rows to Traceability and Weld History) */}
-            <div style={{ marginBottom: 20 }}>
-              <button onClick={() => addRow(scope.id)}>Add Row</button>
-            </div>
+              {/* Add & Delete Row Buttons in same row */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 20
+                }}
+              >
+                <button onClick={() => addRow(scope.id)}>Add Row</button>
+
+                <button
+                  onClick={() => deleteTracandWeldHisRow(scope.id)}
+                  disabled={
+                    scope.traceabilityRows.length === 0 ||
+                    scope.weldHistoryRows.length === 0
+                  }
+                >
+                  Delete Row
+                </button>
+              </div>
 
             {/* Weld History */}
             <h3>Weld History</h3>
@@ -1223,7 +1305,7 @@ const handleDragOver = (e) => e.preventDefault();
               cellPadding="5"
               style={{ borderCollapse: "collapse", width: "100%",tableLayout:"fixed" }}
             >
-<thead>
+            <thead>
   <tr>
     <th rowSpan={2} style={{ width: '8px' }}>Weld No</th>
     <th rowSpan={2} style={{ width: '8px' }}>Welder ID</th>
@@ -1245,7 +1327,7 @@ const handleDragOver = (e) => e.preventDefault();
         Welder<br />Pass No
       </div>
     </th>
-        <th
+    <th
       rowSpan={2}
       style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '17px' }}
     >
@@ -1261,7 +1343,7 @@ const handleDragOver = (e) => e.preventDefault();
         Item to Item<br />Description
       </div>
     </th>
-        <th
+    <th
       rowSpan={2}
       style={{ padding: '6px', verticalAlign: 'middle', height: '60px', width: '22px' }}
     >
@@ -1281,13 +1363,14 @@ const handleDragOver = (e) => e.preventDefault();
     <th rowSpan={2} style={{ width: '7px' }}>Prep Checked By</th>
     <th rowSpan={2} style={{ width: '7px' }}>Final Visual</th>
     <th rowSpan={2} style={{ width: '7px' }}>Date</th>
-    <th rowSpan={2} style={{ width: '7px' }}>M.T./U.T.</th>
+    <th rowSpan={2} style={{ width: '7px' }}>
+      {scope.mtutHeader || "M.T./U.T."}
+    </th>
     <th rowSpan={2} style={{ width: '7px' }}>Initials</th>
     <th rowSpan={2} style={{ width: '7px' }}>Result</th>
     <th rowSpan={2} style={{ width: '7px' }}>Report No</th>
   </tr>
 </thead>
-
 
 
  <tbody>
