@@ -48,7 +48,7 @@ function ImageDropField({ onImageChange, style }) {
       style={{
         border: dragActive ? "3px dashed #4A90E2" : "3px dashed #ccc",
         borderRadius: "12px",
-        width: "80px",
+        width: "60px",
         height: "50px",
         margin: "20px auto",
         display: "flex",
@@ -76,6 +76,79 @@ function ImageDropField({ onImageChange, style }) {
     </div>
   );
 }
+
+function ImageDropFieldWeldJointType({ onImageChange, style }) {
+  const [dragActive, setDragActive] = React.useState(false);
+  const [imagePreview, setImagePreview] = React.useState(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImagePreview(reader.result);
+          if (onImageChange) onImageChange(file);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert("Please drop an image file.");
+      }
+    }
+  };
+
+  return (
+    <div
+      onDragEnter={handleDrag}
+      onDragOver={handleDrag}
+      onDragLeave={handleDrag}
+      onDrop={handleDrop}
+      style={{
+        border: dragActive ? "3px dashed #4A90E2" : "3px dashed #ccc",
+        borderRadius: "12px",
+        width: "110px",    // slightly larger
+        height: "90px",    // slightly larger
+        margin: "20px auto",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        cursor: "pointer",
+        backgroundColor: dragActive ? "#f0f8ff" : "#fafafa",
+        transition: "border-color 0.3s, background-color 0.3s",
+        userSelect: "none",
+        ...style,
+      }}
+    >
+      {imagePreview ? (
+        <img
+          src={imagePreview}
+          alt="Preview"
+          style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: "8px" }}
+        />
+      ) : (
+        <p style={{ fontSize: "18px", color: "#666", textAlign: "center" }}>
+          Drop Image
+        </p>
+      )}
+    </div>
+  );
+}
+
 
 function ImageDropFieldWeldMap({ onImageChange, style, inputId }) {
   const [dragActive, setDragActive] = React.useState(false);
@@ -258,6 +331,22 @@ const updateScopeField = (scopeId, fieldName, value) => {
   );
 };
 
+// Weld joint type image updater
+const updateWeldJointImage = (scopeId, rowId, fieldName, value) => {
+  setScopes((prevScopes) =>
+    prevScopes.map((scope) => {
+      if (scope.id === scopeId) {
+        return {
+          ...scope,
+          weldHistoryRows: scope.weldHistoryRows.map((row) =>
+            row.id === rowId ? { ...row, [fieldName]: value } : row
+          ),
+        };
+      }
+      return scope;
+    })
+  );
+};
 
 //Handle Second Weld Map
 const [weldMapImages, setWeldMapImages] = React.useState({});
@@ -487,7 +576,8 @@ const addScope = () => {
       traceabilityRows: [createTraceabilityRow()],
       weldHistoryRows: [createWeldHistoryRow()],
       weldMapImage: null,      // for storing the image file or data
-      weldMapText: '',         // for storing the text from AutoResizeTextarea
+      weldMapText1: '',         // for storing the text from AutoResizeTextarea
+      weldMapText2: '',
     },
   ]);
 };
@@ -538,11 +628,17 @@ useEffect(() => {
   }
 }, []);
 
-const updateWeldMapText = (scopeId, text) => {
+// Update weld map text 1 and 2
+const updateWeldMapText1 = (scopeId, text) => {
   setScopes((prev) =>
     prev.map((scope) =>
-      scope.id === scopeId ? { ...scope, weldMapText: text } : scope
+      scope.id === scopeId ? { ...scope, weldMapText1: text } : scope
     )
+  );
+};
+const updateWeldMapText2 = (scopeId, value) => {
+  setScopes(prev =>
+    prev.map(s => s.id === scopeId ? { ...s, weldMapText2: value } : s)
   );
 };
   // Update functions for project info
@@ -1441,10 +1537,10 @@ const handleDragOver = (e) => e.preventDefault();
         />
       </td>
       <td style={{ textAlign: 'center' }}>
-        <ImageDropField
+        <ImageDropFieldWeldJointType
           onImageChange={(file) => {
             const reader = new FileReader();
-            reader.onload = () => updateRowField(scope.id, row.id, "Initial", reader.result);
+            reader.onload = () => updateWeldJointImage(scope.id, row.id, "WeldJointType", reader.result);
             reader.readAsDataURL(file);
           }}
         />
@@ -1538,70 +1634,54 @@ const handleDragOver = (e) => e.preventDefault();
 <div style={{ marginTop: '20px' }}>
   <h3>Weld Map and Another Image</h3>
   <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-    <div>
+    {/* Weld Map 1 */}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h4>Weld Map 1</h4>
       <ImageDropFieldWeldMap
         inputId="weldMapInput"
         onImageChange={(file) => updateWeldMapImage(scope.id, file)}
       />
-
+      <AutoResizeTextarea
+  value={scope.weldMapText1}
+  onChange={(e) => updateWeldMapText1(scope.id, e.target.value)}
+  placeholder="Enter Weld Map notes..."
+        style={{
+          width: '300px',   // adjust width to match image or preference
+          fontSize: '14px',
+          padding: '8px',
+          borderRadius: '6px',
+          border: '1px solid #ccc',
+          resize: 'vertical',
+          marginTop: '10px',
+        }}
+      />
     </div>
-    <div>
+
+    {/* Weld Map 2 */}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h4>Weld Map 2</h4>
       <ImageDropFieldWeldMap
         inputId="secondImageInput"
         onImageChange={(file) => updateSecondImage(scope.id, file)}
       />
+<AutoResizeTextarea
+  value={scope.weldMapText2}
+  onChange={(e) => updateWeldMapText2(scope.id, e.target.value)}
+  placeholder="Enter Weld Map notes..."
+        style={{
+          width: '300px',   // adjust width to match image or preference
+          fontSize: '14px',
+          padding: '8px',
+          borderRadius: '6px',
+          border: '1px solid #ccc',
+          resize: 'vertical',
+          marginTop: '10px',
+        }}
+      />
     </div>
   </div>
-
-<div
-  style={{
-    display: 'grid',
-    gridTemplateColumns: '300pt 800px 20px 800px',
-    columnGap: '10px',
-    marginTop: '10px',
-    alignItems: 'start',
-  }}
->
-  {/* Empty grid cell for spacing */}
-  <div></div>
-
-  {/* First text area */}
-  <AutoResizeTextarea
-    value={scope.weldMapText}
-    onChange={(e) => updateWeldMapText(scope.id, e.target.value)}
-    placeholder="Enter Weld Map notes..."
-    style={{
-      width: '800px',
-      fontSize: '14px',
-      padding: '8px',
-      borderRadius: '6px',
-      border: '1px solid #ccc',
-      resize: 'vertical',
-    }}
-  />
-
-  {/* Spacer column between textboxes */}
-  <div></div>
-
-  {/* Second text area */}
-  <AutoResizeTextarea
-    value={scope.weldMapText}
-    onChange={(e) => updateWeldMapText(scope.id, e.target.value)}
-    placeholder="Enter Weld Map notes..."
-    style={{
-      width: '800px',
-      fontSize: '14px',
-      padding: '8px',
-      borderRadius: '6px',
-      border: '1px solid #ccc',
-      resize: 'vertical',
-    }}
-  />
 </div>
 
-</div>
 
 
             {/* Supervisor Signature and Completion Date */}
