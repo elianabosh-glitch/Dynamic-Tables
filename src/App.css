@@ -92,3 +92,10 @@ table.weldHistory td:nth-last-child(-n+7),
 table.weldHistory th:nth-last-child(-n+7) {
   text-align: center;
 }
+.pdf-field {
+  min-height: 28px;       /* allows expansion */
+  padding: 4px 6px;       
+  font-size: 14px;
+  line-height: 1.4;       /* ensures vertical spacing is enough */
+  box-sizing: border-box;
+}

@@ -3,18 +3,14 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import logo from "./TMF icon.jpg";
 import React, { useState, useEffect, useRef} from 'react';
-function ImageDropField({ onImageChange, style }) {
+function ImageDropField({ value, onImageChange, style }) {
   const [dragActive, setDragActive] = React.useState(false);
-  const [imagePreview, setImagePreview] = React.useState(null);
 
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
+    else if (e.type === "dragleave") setDragActive(false);
   };
 
   const handleDrop = (e) => {
@@ -26,88 +22,9 @@ function ImageDropField({ onImageChange, style }) {
       const file = e.dataTransfer.files[0];
       if (file.type.startsWith("image/")) {
         const reader = new FileReader();
-        reader.onload = () => {
-          setImagePreview(reader.result);
-          if (onImageChange) onImageChange(file);
-        };
+        reader.onload = () => onImageChange(reader.result);
         reader.readAsDataURL(file);
-      } else {
-        alert("Please drop an image file.");
-      }
-    }
-  };
-
-  // Removed handleChange and file input because no select option anymore
-
-  return (
-    <div
-      onDragEnter={handleDrag}
-      onDragOver={handleDrag}
-      onDragLeave={handleDrag}
-      onDrop={handleDrop}
-      style={{
-        border: dragActive ? "3px dashed #4A90E2" : "3px dashed #ccc",
-        borderRadius: "12px",
-        width: "60px",
-        height: "50px",
-        margin: "20px auto",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        flexDirection: "column",
-        cursor: "pointer",
-        backgroundColor: dragActive ? "#f0f8ff" : "#fafafa",
-        transition: "border-color 0.3s, background-color 0.3s",
-        userSelect: "none",
-        ...style,
-      }}
-    >
-      {imagePreview ? (
-        <img
-          src={imagePreview}
-          alt="Preview"
-          style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: "8px" }}
-        />
-      ) : (
-        <p style={{ fontSize: "18px", color: "#666", textAlign: "center" }}>
-          Drop Image
-        </p>
-      )}
-    </div>
-  );
-}
-
-function ImageDropFieldWeldJointType({ onImageChange, style }) {
-  const [dragActive, setDragActive] = React.useState(false);
-  const [imagePreview, setImagePreview] = React.useState(null);
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = () => {
-          setImagePreview(reader.result);
-          if (onImageChange) onImageChange(file);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert("Please drop an image file.");
-      }
+      } else alert("Please drop an image file.");
     }
   };
 
@@ -120,9 +37,9 @@ function ImageDropFieldWeldJointType({ onImageChange, style }) {
       style={{
         border: dragActive ? "3px dashed #4A90E2" : "3px dashed #ccc",
         borderRadius: "12px",
-        width: "110px",    // slightly larger
-        height: "90px",    // slightly larger
-        margin: "20px auto",
+        width: "80px",
+        height: "80px",
+        margin: "10px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -134,14 +51,14 @@ function ImageDropFieldWeldJointType({ onImageChange, style }) {
         ...style,
       }}
     >
-      {imagePreview ? (
+      {value ? (
         <img
-          src={imagePreview}
+          src={value}
           alt="Preview"
           style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: "8px" }}
         />
       ) : (
-        <p style={{ fontSize: "18px", color: "#666", textAlign: "center" }}>
+        <p style={{ fontSize: "14px", color: "#666", textAlign: "center" }}>
           Drop Image
         </p>
       )}
@@ -150,9 +67,77 @@ function ImageDropFieldWeldJointType({ onImageChange, style }) {
 }
 
 
-function ImageDropFieldWeldMap({ onImageChange, style, inputId }) {
+function ImageDropFieldWeldJointType({ value, onImageChange, style }) {
   const [dragActive, setDragActive] = React.useState(false);
-  const [imagePreview, setImagePreview] = React.useState(null);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
+    else if (e.type === "dragleave") setDragActive(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith("image/")) {
+        const reader = new FileReader();
+        reader.onload = () => onImageChange(reader.result);
+        reader.readAsDataURL(file);
+      } else alert("Please drop an image file.");
+    }
+  };
+
+  return (
+    <div
+      onDragEnter={handleDrag}
+      onDragOver={handleDrag}
+      onDragLeave={handleDrag}
+      onDrop={handleDrop}
+      style={{
+        border: dragActive ? "3px dashed #4A90E2" : "3px dashed #ccc",
+        borderRadius: "12px",
+        width: "110px",
+        height: "90px",
+        margin: "10px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        cursor: "pointer",
+        backgroundColor: dragActive ? "#f0f8ff" : "#fafafa",
+        transition: "border-color 0.3s, background-color 0.3s",
+        userSelect: "none",
+        ...style,
+      }}
+    >
+      {value ? (
+        <img
+          src={value}
+          alt="Preview"
+          style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: "8px" }}
+        />
+      ) : (
+        <p style={{ fontSize: "14px", color: "#666", textAlign: "center" }}>
+          Drop Image
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ImageDropFieldWeldMap({ onImageChange, style, inputId, imagePreview: imageProp }) {
+  const [dragActive, setDragActive] = React.useState(false);
+  const [imagePreview, setImagePreview] = React.useState(imageProp || null);
+
+  // Update local preview if the prop changes (important for JSON reload)
+  React.useEffect(() => {
+    setImagePreview(imageProp || null);
+  }, [imageProp]);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -183,8 +168,6 @@ function ImageDropFieldWeldMap({ onImageChange, style, inputId }) {
       }
     }
   };
-
-  // Remove handleChange and file input so no "select image" is possible
 
   return (
     <div
@@ -210,19 +193,17 @@ function ImageDropFieldWeldMap({ onImageChange, style, inputId }) {
       }}
     >
       {imagePreview ? (
-<img
-  src={imagePreview}
-  alt="Preview"
-  style={{
-    maxWidth: "100%",
-    maxHeight: "100%",
-    height: "auto",
-    width: "auto",
-    borderRadius: "8px",
-  }}
-/>
-
-
+        <img
+          src={imagePreview}
+          alt="Preview"
+          style={{
+            maxWidth: "100%",
+            maxHeight: "100%",
+            height: "auto",
+            width: "auto",
+            borderRadius: "8px",
+          }}
+        />
       ) : (
         <p style={{ fontSize: "18px", color: "#666", textAlign: "center" }}>
           Drop Image
@@ -232,15 +213,18 @@ function ImageDropFieldWeldMap({ onImageChange, style, inputId }) {
   );
 }
 
-
 function AutoResizeTextarea({ value, onChange, style }) {
   const textareaRef = useRef(null);
+
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'; // reset height to get correct scrollHeight
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px'; // set height to fit content
+      // Reset height to calculate scrollHeight correctly
+      textareaRef.current.style.height = 'auto';
+      // Set height to fit content
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + 4 + 'px';
     }
-  }, [value]); // re-run when value changes
+  }, [value]);
+
   return (
     <textarea
       ref={textareaRef}
@@ -254,66 +238,90 @@ function AutoResizeTextarea({ value, onChange, style }) {
         resize: 'none',
         overflow: 'hidden',
         overflowWrap: 'break-word',
-        ...style,
+        lineHeight: '1.4',     // ensures text fits vertically
+        padding: '6px',        // extra padding to avoid clipping
+        fontSize: '14px',      // matches PDF export size
+        minHeight: '28px',     // ensures minimal height
+        ...style,              // allows additional inline styles
       }}
     />
   );
 }
-function SupervisorSignatureInput({ supervisorSignature, setSupervisorSignature }) {
-  const fileInputRef = useRef(null);
+
+function SupervisorSignatureInput({ value, onChange, style }) {
+  const [dragActive, setDragActive] = React.useState(false);
+  const [imagePreview, setImagePreview] = React.useState(value || null);
+
+  React.useEffect(() => {
+    // Update preview whenever value (base64) changes
+    if (value) setImagePreview(value);
+  }, [value]);
+
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") setDragActive(true);
+    else if (e.type === "dragleave") setDragActive(false);
+  };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setSupervisorSignature(reader.result);
-    reader.readAsDataURL(file);
-  };
+    e.stopPropagation();
+    setDragActive(false);
 
-  const handleDragOver = (e) => e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (!file.type.startsWith("image/")) return alert("Please drop an image file.");
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setSupervisorSignature(reader.result);
-    reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImagePreview(reader.result);
+        if (onChange) onChange(reader.result); // store base64 directly in App state
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
     <div
+      onDragEnter={handleDrag}
+      onDragOver={handleDrag}
+      onDragLeave={handleDrag}
       onDrop={handleDrop}
-      onDragOver={handleDragOver}
-      onClick={() => fileInputRef.current && fileInputRef.current.click()}
       style={{
-        border: "2px dashed #999",
-        borderRadius: 6,
-        width: 150,
-        height: 80,
-        cursor: "pointer",
+        border: dragActive ? "3px dashed #4A90E2" : "3px dashed #ccc",
+        borderRadius: "12px",
+        width: "250px",
+        height: "150px",
+        margin: "10px auto",
         display: "flex",
-        justifyContent: "center",
         alignItems: "center",
-        color: "#999",
-        position: "relative",
-        marginLeft: 10,
+        justifyContent: "center",
+        flexDirection: "column",
+        cursor: "pointer",
+        backgroundColor: dragActive ? "#f0f8ff" : "#fafafa",
+        transition: "border-color 0.3s, background-color 0.3s",
+        userSelect: "none",
+        ...style,
       }}
-      title="Click or drag & drop signature image here"
     >
-      {supervisorSignature ? (
+      {imagePreview ? (
         <img
-          src={supervisorSignature}
-          alt="Supervisor Signature"
-          style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+          src={imagePreview}
+          alt="Signature Preview"
+          style={{ maxWidth: "100%", maxHeight: "100%", borderRadius: "8px" }}
         />
       ) : (
-        <span>Drop Signature</span>
+        <p style={{ fontSize: "16px", color: "#666", textAlign: "center" }}>
+          Drop Signature
+        </p>
       )}
     </div>
   );
 }
+
 function App() {
+const pdfExportRef = useRef();
 const [columnName, setColumnName] = React.useState("M.T./U.T.");
 const handleImageChange = (file) => {
     console.log('Selected image file:', file);
@@ -347,35 +355,29 @@ const updateWeldJointImage = (scopeId, rowId, fieldName, value) => {
     })
   );
 };
+// --- Generic scope field updater ---
+const updateScopeFieldImage = (scopeId, field, value) => {
+  setScopes(prev =>
+    prev.map(scope =>
+      scope.id === scopeId ? { ...scope, [field]: value } : scope
+    )
+  );
+};
 
-//Handle Second Weld Map
-const [weldMapImages, setWeldMapImages] = React.useState({});
-const [secondImages, setSecondImages] = React.useState({});
-
-function updateWeldMapImage(scopeId, file) {
+// --- Weld Map image updater using the generic function ---
+const updateWeldMapImage = (scopeId, file, fieldName) => {
   const reader = new FileReader();
   reader.onload = () => {
-    setWeldMapImages(prev => ({
-      ...prev,
-      [scopeId]: reader.result, // store image data URL keyed by scopeId
-    }));
+    updateScopeField(scopeId, fieldName, reader.result);
   };
   reader.readAsDataURL(file);
-}
+};
 
-function updateSecondImage(scopeId, file) {
-  const reader = new FileReader();
-  reader.onload = () => {
-    setSecondImages(prev => ({
-      ...prev,
-      [scopeId]: reader.result, // store image data URL keyed by scopeId
-    }));
-  };
-  reader.readAsDataURL(file);
-}
 // state object: { [scopeId]: base64ImageData }
 
 const [scopeDescription, setScopeDescription] = useState('');
+
+// Export PDF function
 const exportPDF = () => {
   const input = document.querySelector(".App");
   if (!input) {
@@ -384,36 +386,35 @@ const exportPDF = () => {
   }
 
   html2canvas(input, {
-    scale: 2, // increase resolution
-    scrollY: -window.scrollY, // to avoid clipping if page is scrolled
-    useCORS: true, // allow cross-origin images (like your logo)
-  })
+  scale: 2, 
+  scrollY: -window.scrollY,
+  useCORS: true,
+})
+
     .then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("portrait", "pt", "a4"); // or 'landscape' if you prefer
+      const imgData = canvas.toDataURL("image/png", 0.8); // compress PNG a bit
+      const pdf = new jsPDF("portrait", "pt", "a4");
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      // Calculate image height to keep aspect ratio
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       const ratio = imgWidth / imgHeight;
       let pdfImgHeight = pdfWidth / ratio;
 
-      // If the canvas height is taller than one page, you need to split into pages:
       if (pdfImgHeight > pdfHeight) {
-        // For very tall content, you might want to add multiple pages (advanced)
-        // For now, just fit to one page (may compress)
         pdfImgHeight = pdfHeight;
       }
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfImgHeight);
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfImgHeight, undefined, "FAST");
       pdf.save("weld-history.pdf");
     })
     .catch((err) => {
       console.error("Error exporting PDF:", err);
       alert("Error exporting PDF: " + err.message);
-    });};const generateId = () => Date.now() + Math.random();
+    });
+};
+const generateId = () => Date.now() + Math.random();
   // Dropdown options
   const weldNoOptions = Array.from({ length: 25 }, (_, i) => `W${i + 1}`);
   const welderIdOptions = Array.from({ length: 5 }, (_, i) => `TMF-00${i + 1}`);
@@ -426,7 +427,6 @@ const exportPDF = () => {
     "Grade 250", "Grade 350", "Grade 700", "AISI/SAE 1020", "AISI/SAE 1040","AISI/SAE 20MnV6", "ASTM A105","ASTM A106 Gr.B", "ASTM A106", "AISI 4130",
     "AISI/SAE 1020", "AISI/SAE 1045","Other"
   ];
-
   // Create empty rows
   const createMaterialRow = () => ({
     id: generateId(),
@@ -505,8 +505,28 @@ const exportPDF = () => {
     scope.id === scopeId ? { ...scope, scopeDescription: newDescription } : scope
   ));
 };
-
-// Code to load JSON file and set state
+// Handles any row-level image field (Initial, WeldJointType, etc.)
+const updateRowImage = (scopeId, rowId, fieldName, value) => {
+  setScopes(prevScopes =>
+    prevScopes.map(scope => {
+      if (scope.id === scopeId) {
+        return {
+          ...scope,
+          // update weldHistoryRows
+          weldHistoryRows: scope.weldHistoryRows.map(row =>
+            row.id === rowId ? { ...row, [fieldName]: value } : row
+          ),
+          // update traceabilityRows
+          traceabilityRows: scope.traceabilityRows.map(row =>
+            row.id === rowId ? { ...row, [fieldName]: value } : row
+          ),
+        };
+      }
+      return scope;
+    })
+  );
+};
+// Load JSON file and restore state including images
 const loadData = (e) => {
   const fileReader = new FileReader();
   fileReader.onload = (event) => {
@@ -515,21 +535,66 @@ const loadData = (e) => {
 
       if (importedData.scopes) setScopes(importedData.scopes);
       if (importedData.projectInfo) setProjectInfo(importedData.projectInfo);
+
+      // Restore supervisor signature
+      if (importedData.supervisorSignature) {
+        setSupervisorSignature(importedData.supervisorSignature);
+      } else {
+        setSupervisorSignature("");
+      }
     } catch (err) {
       alert("Invalid JSON file.");
     }
   };
-  if (e.target.files[0]) {
-    fileReader.readAsText(e.target.files[0]);
-  }
+  if (e.target.files[0]) fileReader.readAsText(e.target.files[0]);
 };
 
-const exportData = () => {
+
+// Code to load JSON file and set state
+// Helper: convert File object or base64 string to base64
+const fileToBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    if (!file) return resolve(null);           // handle null
+    if (typeof file === "string") return resolve(file); // already base64
+
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+
+// --- Export JSON ---
+const exportData = async () => {
+  const scopesClone = JSON.parse(JSON.stringify(scopes)); // deep clone
+
+  for (const scope of scopesClone) {
+    // Convert top-level scope images (weld maps)
+    for (const key of ["weldMapImage1", "weldMapImage2"]) {
+      if (scope[key]) scope[key] = await fileToBase64(scope[key]);
+    }
+
+    // Convert images in nested rows
+    for (const rowArrayKey of ["materialRows", "traceabilityRows", "weldHistoryRows"]) {
+      if (Array.isArray(scope[rowArrayKey])) {
+        for (const row of scope[rowArrayKey]) {
+          for (const rowKey in row) {
+            if (row[rowKey]) row[rowKey] = await fileToBase64(row[rowKey]);
+          }
+        }
+      }
+    }
+  }
+
+  // Convert supervisor signature
+  const supervisorSignatureBase64 = await fileToBase64(supervisorSignature);
+
   const dataToSave = {
-    scopes,
+    scopes: scopesClone,
     projectInfo,
+    supervisorSignature: supervisorSignatureBase64,
   };
-  const dataStr = JSON.stringify(dataToSave, null, 2); // Pretty format
+
+  const dataStr = JSON.stringify(dataToSave, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
@@ -541,12 +606,12 @@ const exportData = () => {
   URL.revokeObjectURL(url);
 };
 
+// --- Import JSON ---
 const importData = (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
-
   reader.onload = (e) => {
     try {
       const data = JSON.parse(e.target.result);
@@ -556,13 +621,11 @@ const importData = (event) => {
       alert("Invalid backup file.");
     }
   };
-
   reader.readAsText(file);
 
-  // Reset input so same file can be selected again if needed
+  // Reset input so same file can be selected again
   event.target.value = null;
 };
-
 
 
 // Add a new scope with initial rows and scopeDescription
@@ -575,9 +638,10 @@ const addScope = () => {
       materialRows: [createMaterialRow()],
       traceabilityRows: [createTraceabilityRow()],
       weldHistoryRows: [createWeldHistoryRow()],
-      weldMapImage: null,      // for storing the image file or data
-      weldMapText1: '',         // for storing the text from AutoResizeTextarea
-      weldMapText2: '',
+      weldMapImage1: null,                  // image for Weld Map 1
+      weldMapText1: '',                // text under Weld Map 1
+      weldMapImage2: null,                  // image for Weld Map 2
+      weldMapText2: '',                // text under Weld Map 2
     },
   ]);
 };
@@ -802,72 +866,194 @@ const handleDragOver = (e) => e.preventDefault();
       <img src={logo} alt="logo" style={{ width: 200, marginBottom: 10 }} />
       <h1 style={{ lineHeight: 1.4 }}>Project Report </h1>
 
-      {/* Project Info */}
+{/* Project Info */}
+<div style={{ marginBottom: 20 }}>
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(2, 1fr)",
+      gap: 10,
+      marginBottom: 10,
+    }}
+  >
+    {/* Project Title */}
+    <div>
+      <label>Project Title:</label>
+      <input
+        value={projectInfo.title}
+        onChange={(e) => updateProjectInfo("title", e.target.value)}
+        style={{ height: '40px', padding: '4px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}
+      />
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: 10,
-          marginBottom: 10,
+          display: 'none',
+          height: '40px',
+          padding: '4px',
+          border: '1px solid #ccc',
+          width: '100%',
+          boxSizing: 'border-box',
+          textAlign: 'center',
         }}
       >
-        <label>
-          Project Title:
-          <input
-            value={projectInfo.title}
-            onChange={(e) => updateProjectInfo("title", e.target.value)}
-          />
-        </label>
-        <label>
-          Project No:
-          <input
-            value={projectInfo.number}
-            onChange={(e) => updateProjectInfo("number", e.target.value)}
-          />
-        </label>
-        <label>
-          Job Details:
-          <input
-            value={projectInfo.jobDetails}
-            onChange={(e) => updateProjectInfo("jobDetails", e.target.value)}
-          />
-        </label>
-        <label>
-          Job No:
-          <input
-            value={projectInfo.jobNumber}
-            onChange={(e) => updateProjectInfo("jobNumber", e.target.value)}
-          />
-        </label>
+        {projectInfo.title}
       </div>
+    </div>
 
+    {/* Project No */}
+    <div>
+      <label>Project No:</label>
+      <input
+        value={projectInfo.number}
+        onChange={(e) => updateProjectInfo("number", e.target.value)}
+        style={{ height: '40px', padding: '4px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}
+      />
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 10,
-          marginBottom: 20,
+          display: 'none',
+          height: '40px',
+          padding: '4px',
+          border: '1px solid #ccc',
+          width: '100%',
+          boxSizing: 'border-box',
+          textAlign: 'center',
         }}
       >
-        <label>
-          Client:
-          <input
-            value={projectInfo.client}
-            onChange={(e) => updateProjectInfo("client", e.target.value)}
-          />
-        </label>
-        <label>
-          Client Ref:
-          <input
-            value={projectInfo.clientRef}
-            onChange={(e) => updateProjectInfo("clientRef", e.target.value)}
-          />
-        </label>
-        <label>
-          Supervisor Name:
-          <input value={projectInfo.supervisorName} readOnly />
-        </label>
+        {projectInfo.number}
       </div>
+    </div>
+
+    {/* Job Details */}
+    <div>
+      <label>Job Details:</label>
+      <input
+        value={projectInfo.jobDetails}
+        onChange={(e) => updateProjectInfo("jobDetails", e.target.value)}
+        style={{ height: '40px', padding: '4px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}
+      />
+      <div
+        style={{
+          display: 'none',
+          height: '40px',
+          padding: '4px',
+          border: '1px solid #ccc',
+          width: '100%',
+          boxSizing: 'border-box',
+          textAlign: 'center',
+        }}
+      >
+        {projectInfo.jobDetails}
+      </div>
+    </div>
+
+    {/* Job Number */}
+    <div>
+      <label>Job No:</label>
+      <input
+        value={projectInfo.jobNumber}
+        onChange={(e) => updateProjectInfo("jobNumber", e.target.value)}
+        style={{ height: '40px', padding: '4px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}
+      />
+      <div
+        style={{
+          display: 'none',
+          height: '40px',
+          padding: '4px',
+          border: '1px solid #ccc',
+          width: '100%',
+          boxSizing: 'border-box',
+          textAlign: 'center',
+        }}
+      >
+        {projectInfo.jobNumber}
+      </div>
+    </div>
+  </div>
+
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(3, 1fr)",
+      gap: 10,
+    }}
+  >
+    {/* Client */}
+    <div>
+      <label>Client:</label>
+      <input
+        value={projectInfo.client}
+        onChange={(e) => updateProjectInfo("client", e.target.value)}
+        style={{ height: '40px', padding: '4px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}
+      />
+      <div
+        style={{
+          display: 'none',
+          height: '40px',
+          padding: '4px',
+          border: '1px solid #ccc',
+          width: '100%',
+          boxSizing: 'border-box',
+          textAlign: 'center',
+        }}
+      >
+        {projectInfo.client}
+      </div>
+    </div>
+
+    {/* Client Ref */}
+    <div>
+      <label>Client Ref:</label>
+      <input
+        value={projectInfo.clientRef}
+        onChange={(e) => updateProjectInfo("clientRef", e.target.value)}
+        style={{ height: '40px', padding: '4px', width: '100%', boxSizing: 'border-box', textAlign: 'center' }}
+      />
+      <div
+        style={{
+          display: 'none',
+          height: '40px',
+          padding: '4px',
+          border: '1px solid #ccc',
+          width: '100%',
+          boxSizing: 'border-box',
+          textAlign: 'center',
+        }}
+      >
+        {projectInfo.clientRef}
+      </div>
+    </div>
+
+    {/* Supervisor Name (read-only) */}
+    <div>
+      <label>Supervisor Name:</label>
+      <input
+        value={projectInfo.supervisorName}
+        readOnly
+        style={{
+          height: '40px',
+          padding: '4px',
+          width: '100%',
+          boxSizing: 'border-box',
+          backgroundColor:'#f0f0f0',
+          textAlign: 'center'
+        }}
+      />
+      <div
+        style={{
+          display: 'none',
+          height: '40px',
+          padding: '4px',
+          border: '1px solid #ccc',
+          width: '100%',
+          boxSizing: 'border-box',
+          textAlign: 'center',
+        }}
+      >
+        {projectInfo.supervisorName}
+      </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Welding Requirement Details */}
       <div
@@ -969,19 +1155,47 @@ const handleDragOver = (e) => e.preventDefault();
         >
          Scope Description
         </label>
-        <AutoResizeTextarea
-          id={`scopeDescription-${scope.id}`}
-          value={scope.scopeDescription || ""}
-          onChange={(e) => updateScopeDescription(scope.id, e.target.value)}
-          style={{
-            padding: 8,
-            fontSize: '1.8em',
-            boxSizing: 'border-box',
-            flex: 1,
-            minWidth: '300px'
-          }}
-          placeholder="Enter scope description"
-        />
+<td
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    height: "100%",
+    padding: 0,
+  }}
+>
+  <div
+    contentEditable
+    suppressContentEditableWarning
+    onInput={(e) =>
+      updateScopeDescription(scope.id, e.currentTarget.textContent)
+    }
+    style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      textAlign: "center",     // horizontal centering
+      width: "100%",
+      height: "100%",
+      fontSize: "1.6em",
+      lineHeight: "1.6em",
+      padding: "8px",
+      boxSizing: "border-box",
+      whiteSpace: "pre-wrap",
+      overflowWrap: "break-word",
+      outline: "none",         // looks like a textarea
+      border: "1px solid #ccc",
+      borderRadius: "4px",
+      minHeight: "2.5em",
+    }}
+    placeholder="Enter scope description"
+  >
+    {scope.scopeDescription || ""}
+  </div>
+</td>
+
+
       </div>
 
       {/* Material Certificate Register title */}
@@ -1044,16 +1258,23 @@ const handleDragOver = (e) => e.preventDefault();
   style={{ textAlign: 'center', whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
                       />
                     </td>
-                    <td>
-                      <AutoResizeTextarea 
-                        value={row.batchNo}
-                        onChange={(e) =>
-                          updateMaterialRowField(scope.id, row.id, "batchNo", e.target.value)
-                        }
-                      rows={3}       // sets visible height
-  style={{ textAlign: 'center', whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
+          <td>
+  <AutoResizeTextarea 
+    value={row.batchNo}
+    onChange={(e) =>
+      updateMaterialRowField(scope.id, row.id, "batchNo", e.target.value)
+    }
+    style={{ 
+      textAlign: 'center', 
+      padding: '6px',        // ensure PDF text isn't clipped
+      lineHeight: '1.4',     // vertical spacing for PDF
+      width: '100%',
+      boxSizing: 'border-box',
+      whiteSpace: 'pre-wrap',
+    }}
   />
-                    </td>
+</td>
+
                     <td>
                       <AutoResizeTextarea 
                         value={row.serialNo}
@@ -1074,47 +1295,61 @@ const handleDragOver = (e) => e.preventDefault();
                         style={{ textAlign: 'center', whiteSpace: 'pre-wrap', width:'100%',boxSizing: 'border-box'}} // wrap + allow resize
                       />
                     </td>
-                    <td>
-                      <select
-                      style={{ textAlign: 'center'}}
-                        value={row.grade}
-                        onChange={(e) =>
-                          updateMaterialRowField(scope.id, row.id, "grade", e.target.value)
-                        }
-                      >
-                        {materialTypeOptions.map((opt) => (
-                          <option key={opt} value={opt}>
-                            {opt}
-                          </option>
-                        ))}
-                      </select>
-                      {row.grade === "Other" && (
-                        <AutoResizeTextarea 
-                          placeholder="Specify other"
-                          value={row.gradeOther}
-                          onChange={(e) =>
-                            updateMaterialRowField(scope.id, row.id, "gradeOther", e.target.value)
-                          }
-                          style={{ marginTop: 5 }}
-                        />
-                      )}
-                    </td>
-<td>
-<input
-  type="date"
-  value={row.inServiceDate || ''}
-  onChange={(e) =>
-    updateMaterialRowField(scope.id, row.id, "inServiceDate", e.target.value)
-  }
+      <td>
+  <select
     style={{
-    textAlign: 'center',
-    width: '100%',
-    boxSizing: 'border-box',
-    height: '28px' // match other inputs
-  }}
-/>
+      textAlign: 'center',
+      height: '40px',       // taller dropdown
+      padding: '4px',       // spacing inside
+      boxSizing: 'border-box',
+    }}
+    value={row.grade}
+    onChange={(e) =>
+      updateMaterialRowField(scope.id, row.id, "grade", e.target.value)
+    }
+  >
+    {materialTypeOptions.map((opt) => (
+      <option key={opt} value={opt}>
+        {opt}
+      </option>
+    ))}
+  </select>
 
+  {row.grade === "Other" && (
+    <AutoResizeTextarea
+      placeholder="Specify other"
+      value={row.gradeOther}
+      onChange={(e) =>
+        updateMaterialRowField(scope.id, row.id, "gradeOther", e.target.value)
+      }
+      style={{
+        marginTop: 5,
+        height: '40px',       // taller text box
+        padding: '4px',
+        textAlign: 'center',
+        boxSizing: 'border-box',
+      }}
+    />
+  )}
 </td>
+
+<td>
+  <input
+    type="date"
+    value={row.inServiceDate || ''}
+    onChange={(e) =>
+      updateMaterialRowField(scope.id, row.id, "inServiceDate", e.target.value)
+    }
+    style={{
+      textAlign: 'center',
+      width: '100%',
+      boxSizing: 'border-box',
+      height: '40px',     // taller date box
+      padding: '4px',     // optional: keeps text away from edges
+    }}
+  />
+</td>
+
                   </tr>
                 ))}
               </tbody>
@@ -1207,13 +1442,18 @@ const handleDragOver = (e) => e.preventDefault();
                 {scope.traceabilityRows.map((row) => (
                   <tr key={row.id}>
                   
-                    <td>
+   <td>
   <select
     value={row.WeldNo}
     onChange={(e) =>
       updateRowField(scope.id, row.id, "WeldNo", e.target.value)
     }
-    style={{ textAlign: "center" }}
+    style={{
+      textAlign: "center",
+      height: "40px",       // taller dropdown
+      padding: "4px",       // keeps text nicely spaced
+      boxSizing: "border-box",
+    }}
   >
     <option value="">Select</option>
     {weldNoOptions.map((opt) => (
@@ -1224,13 +1464,19 @@ const handleDragOver = (e) => e.preventDefault();
   </select>
 </td>
 
+
 <td>
   <select
     value={row.WelderId}
     onChange={(e) =>
       updateRowField(scope.id, row.id, "WelderId", e.target.value)
     }
-    style={{ textAlign: "center" }}
+    style={{
+      textAlign: "center",
+      height: "40px",       // taller dropdown
+      padding: "4px",       // keeps text nicely spaced
+      boxSizing: "border-box",
+    }}
   >
     <option value="">Select</option>
     {welderIdOptions.map((opt) => (
@@ -1241,6 +1487,7 @@ const handleDragOver = (e) => e.preventDefault();
   </select>
 </td>
 
+
 <td>
   <input
     type="date"
@@ -1248,9 +1495,16 @@ const handleDragOver = (e) => e.preventDefault();
     onChange={(e) =>
       updateRowField(scope.id, row.id, "Welddate", e.target.value)
     }
-    style={{ width: "100%", boxSizing: "border-box", textAlign: "center" }}
+    style={{
+      width: "100%",
+      boxSizing: "border-box",
+      textAlign: "center",
+      height: "40px",    // makes the date box taller
+      padding: "4px",    // optional: keeps text from touching edges
+    }}
   />
 </td>
+
 
 <td>
   <select
@@ -1263,7 +1517,12 @@ const handleDragOver = (e) => e.preventDefault();
         e.target.value
       )
     }
-    style={{ textAlign: "center" }}
+    style={{
+      textAlign: "center",
+      height: "40px",       // taller dropdown
+      padding: "4px",       // keeps text nicely spaced
+      boxSizing: "border-box",
+    }}
   >
     <option value="">Select</option>
     {wpsOptions.map((opt) => (
@@ -1274,13 +1533,19 @@ const handleDragOver = (e) => e.preventDefault();
   </select>
 </td>
 
+
 <td>
   <select
     value={row.WeldingProcess}
     onChange={(e) =>
       updateRowField(scope.id, row.id, "WeldingProcess", e.target.value)
     }
-    style={{ textAlign: "center" }}
+    style={{
+      textAlign: "center",
+      height: "40px",      // makes the dropdown taller
+      padding: "4px",      // optional: keeps text spaced nicely
+      boxSizing: "border-box",
+    }}
   >
     <option value="">Select</option>
     {weldingProcesses.map((opt) => (
@@ -1290,6 +1555,7 @@ const handleDragOver = (e) => e.preventDefault();
     ))}
   </select>
 </td>
+
 
 <td>
   <AutoResizeTextarea
@@ -1307,7 +1573,12 @@ const handleDragOver = (e) => e.preventDefault();
     onChange={(e) =>
       updateRowField(scope.id, row.id, "MaterialThickness", e.target.value)
     }
-    style={{ textAlign: "center" }}
+    style={{
+      textAlign: "center",
+      height: "40px",      // makes the dropdown taller
+      padding: "4px",      // optional: keeps text spaced nicely
+      boxSizing: "border-box",
+    }}
   >
     <option value="">Select</option>
     {materialThicknessOptions.map((opt) => (
@@ -1325,10 +1596,17 @@ const handleDragOver = (e) => e.preventDefault();
       onChange={(e) =>
         updateRowField(scope.id, row.id, "MaterialThicknessOther", e.target.value)
       }
-      style={{ marginTop: 5, textAlign: "center" }}
+      style={{
+        marginTop: 5,
+        textAlign: "center",
+        height: "40px",       // makes the text box taller
+        padding: "4px",       // optional: spacing inside
+        boxSizing: "border-box",
+      }}
     />
   )}
 </td>
+
 
 <td>
   <AutoResizeTextarea
@@ -1351,15 +1629,12 @@ const handleDragOver = (e) => e.preventDefault();
 </td>
 
 <td style={{ width: 15, height: 50, verticalAlign: "middle" }}>
-  <ImageDropField
-    onImageChange={(file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        updateRowField(scope.id, row.id, "Initial", reader.result);
-      };
-      reader.readAsDataURL(file);
-    }}
-  />
+<ImageDropField
+  value={row.Initial}
+  onImageChange={(base64) =>
+    updateRowImage(scope.id, row.id, "Initial", base64)
+  }
+/>
 </td>
 
 {/* Change MTUT header by user input and update Weld History MTUT header with same input */} 
@@ -1376,15 +1651,12 @@ const handleDragOver = (e) => e.preventDefault();
 
 
 <td style={{ width: 15, height: 50, verticalAlign: "middle" }}>
-  <ImageDropField
-    onImageChange={(file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        updateRowField(scope.id, row.id, "Initial", reader.result);
-      };
-      reader.readAsDataURL(file);
-    }}
-  />
+<ImageDropField
+  value={row.Initial}
+  onImageChange={(base64) =>
+    updateRowImage(scope.id, row.id, "Initial", base64)
+  }
+/>
 </td>
 
 {/* NDE report columns */}
@@ -1395,9 +1667,16 @@ const handleDragOver = (e) => e.preventDefault();
     onChange={(e) =>
       updateRowField(scope.id, row.id, "NDEReportdate", e.target.value)
     }
-    style={{ width: "100%", boxSizing: "border-box", textAlign: "center" }}
+    style={{
+      width: "100%",
+      boxSizing: "border-box",
+      textAlign: "center",
+      height: "40px",   // makes the date box taller
+      padding: "4px",   // optional: keeps text from touching edges
+    }}
   />
 </td>
+
 
 <td>
   <AutoResizeTextarea
@@ -1519,31 +1798,37 @@ const handleDragOver = (e) => e.preventDefault();
 
       {/* Middle columns (editable/flexible) */}
       <td style={{ textAlign: 'center' }}>
-        <select
-          value={row.welderNames}
-          onChange={(e) => updateRowField(scope.id, row.id, "welderNames", e.target.value)}
-          style={{ textAlign: 'center' }}
-        >
-          <option value="">Select Welder Name</option>
-          {welderNames.map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
-          ))}
-        </select>
-        <AutoResizeTextarea
-          value={row.PassNoOptions}
-          onChange={(e) => updateRowField(scope.id, row.id, "PassNoOptions", e.target.value)}
-          placeholder="PassNo"
-          style={{ textAlign: 'center' }}
-        />
-      </td>
+  <select
+    value={row.welderNames}
+    onChange={(e) => updateRowField(scope.id, row.id, "welderNames", e.target.value)}
+    style={{
+      textAlign: 'center',
+      height: '40px',      // makes the dropdown taller
+      padding: '4px',      // optional: keeps text away from edges
+      boxSizing: 'border-box',
+    }}
+  >
+    <option value="">Select Welder Name</option>
+    {welderNames.map((opt) => (
+      <option key={opt} value={opt}>{opt}</option>
+    ))}
+  </select>
+
+  <AutoResizeTextarea
+    value={row.PassNoOptions}
+    onChange={(e) => updateRowField(scope.id, row.id, "PassNoOptions", e.target.value)}
+    placeholder="PassNo"
+    style={{ textAlign: 'center' }}
+  />
+</td>
+
       <td style={{ textAlign: 'center' }}>
-        <ImageDropFieldWeldJointType
-          onImageChange={(file) => {
-            const reader = new FileReader();
-            reader.onload = () => updateWeldJointImage(scope.id, row.id, "WeldJointType", reader.result);
-            reader.readAsDataURL(file);
-          }}
-        />
+<ImageDropFieldWeldJointType
+  value={row.WeldJointType}
+  onImageChange={(base64) =>
+    updateWeldJointImage(scope.id, row.id, "WeldJointType", base64)
+  }
+/>
       </td>
       <td style={{ textAlign: 'center' }}>
         <AutoResizeTextarea
@@ -1589,14 +1874,21 @@ const handleDragOver = (e) => e.preventDefault();
           style={{ textAlign: 'center' }}
         />
       </td>
-      <td style={{ textAlign: 'center' }}>
-        <input
-          type="date"
-          value={row.NDEReportdate || ''}
-          onChange={(e) => updateWeldHistoryRowField(scope.id, row.id, "NDEReportdate", e.target.value)}
-          style={{ width: '100%', boxSizing: 'border-box', textAlign: 'center' }}
-        />
-      </td>
+<td style={{ textAlign: 'center' }}>
+  <input
+    type="date"
+    value={row.NDEReportdate || ''}
+    onChange={(e) => updateWeldHistoryRowField(scope.id, row.id, "NDEReportdate", e.target.value)}
+    style={{
+      width: '100%',
+      boxSizing: 'border-box',
+      textAlign: 'center',
+      height: '40px',       // makes the date box taller
+      padding: '4px',       // optional: keeps text away from edges
+    }}
+  />
+</td>
+
       <td style={{ textAlign: 'center' }}>
         <AutoResizeTextarea
           value={row.Mtu}
@@ -1605,13 +1897,12 @@ const handleDragOver = (e) => e.preventDefault();
         />
       </td>
       <td style={{ textAlign: 'center' }}>
-        <ImageDropField
-          onImageChange={(file) => {
-            const reader = new FileReader();
-            reader.onload = () => updateRowField(scope.id, row.id, "Initial", reader.result);
-            reader.readAsDataURL(file);
-          }}
-        />
+<ImageDropField
+  value={row.Initial}
+  onImageChange={(base64) =>
+    updateRowImage(scope.id, row.id, "Initial", base64)
+  }
+/>
       </td>
       <td style={{ textAlign: 'center' }}>
         <AutoResizeTextarea
@@ -1634,56 +1925,59 @@ const handleDragOver = (e) => e.preventDefault();
 <div style={{ marginTop: '20px' }}>
   <h3>Weld Map and Another Image</h3>
   <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-    {/* Weld Map 1 */}
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <h4>Weld Map 1</h4>
-      <ImageDropFieldWeldMap
-        inputId="weldMapInput"
-        onImageChange={(file) => updateWeldMapImage(scope.id, file)}
-      />
-      <AutoResizeTextarea
+{/* Weld Map 1 */}
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  <h4>Weld Map 1</h4>
+<ImageDropFieldWeldMap
+  inputId="weldMapInput"
+  imagePreview={scope.weldMapImage1}
+  onImageChange={(file) => updateWeldMapImage(scope.id, file, "weldMapImage1")}
+/>
+<AutoResizeTextarea
   value={scope.weldMapText1}
   onChange={(e) => updateWeldMapText1(scope.id, e.target.value)}
   placeholder="Enter Weld Map notes..."
-        style={{
-          width: '300px',   // adjust width to match image or preference
-          fontSize: '14px',
-          padding: '8px',
-          borderRadius: '6px',
-          border: '1px solid #ccc',
-          resize: 'vertical',
-          marginTop: '10px',
-        }}
-      />
-    </div>
+  style={{
+    width: '300px',       // adjust width to match image or preference
+    fontSize: '14px',
+    padding: '8px',
+    borderRadius: '6px',
+    border: '1px solid #ccc',
+    resize: 'vertical',
+    marginTop: '10px',
+    textAlign: 'center',   // centers text horizontally
+  }}
+/>
 
-    {/* Weld Map 2 */}
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <h4>Weld Map 2</h4>
-      <ImageDropFieldWeldMap
-        inputId="secondImageInput"
-        onImageChange={(file) => updateSecondImage(scope.id, file)}
-      />
+</div>
+
+{/* Weld Map 2 */}
+<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  <h4>Weld Map 2</h4>
+<ImageDropFieldWeldMap
+  inputId="secondImageInput"
+  imagePreview={scope.weldMapImage2}
+  onImageChange={(file) => updateWeldMapImage(scope.id, file, "weldMapImage2")}
+/>
 <AutoResizeTextarea
   value={scope.weldMapText2}
   onChange={(e) => updateWeldMapText2(scope.id, e.target.value)}
   placeholder="Enter Weld Map notes..."
-        style={{
-          width: '300px',   // adjust width to match image or preference
-          fontSize: '14px',
-          padding: '8px',
-          borderRadius: '6px',
-          border: '1px solid #ccc',
-          resize: 'vertical',
-          marginTop: '10px',
-        }}
-      />
-    </div>
-  </div>
+  style={{
+    width: '300px',       // adjust width to match image or preference
+    fontSize: '14px',
+    padding: '8px',
+    borderRadius: '6px',
+    border: '1px solid #ccc',
+    resize: 'vertical',
+    marginTop: '10px',
+    textAlign: 'center',   // centers text horizontally
+  }}
+/>
+
 </div>
-
-
-
+</div>
+</div>
             {/* Supervisor Signature and Completion Date */}
             <div
               style={{
@@ -1696,19 +1990,26 @@ const handleDragOver = (e) => e.preventDefault();
             >
 <label>
   Supervisor Signature:
-  <SupervisorSignatureInput
-    supervisorSignature={supervisorSignature}
-    setSupervisorSignature={setSupervisorSignature}
-  />
+<SupervisorSignatureInput
+  value={supervisorSignature}
+  onChange={setSupervisorSignature}
+/>
 </label>
               <label>
                 Final Completion Date:
-                <input
-                  type="date"
-                  value={finalCompletionDate}
-                  onChange={(e) => setFinalCompletionDate(e.target.value)}
-                  style={{ marginLeft: 10 }}
-                />
+<input
+  type="date"
+  value={finalCompletionDate}
+  onChange={(e) => setFinalCompletionDate(e.target.value)}
+  style={{
+    marginLeft: 10,
+    height: '40px',        // taller box
+    padding: '4px',        // optional: keep text from touching edges
+    boxSizing: 'border-box',
+    textAlign: 'center'    // optional: center date text horizontally
+  }}
+/>
+
               </label>
             </div>
           </div>
