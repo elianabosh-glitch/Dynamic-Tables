@@ -551,11 +551,14 @@ const loadData = (e) => {
 
 
 // Code to load JSON file and set state
-// Helper: convert File object or base64 string to base64
 const fileToBase64 = (file) =>
   new Promise((resolve, reject) => {
-    if (!file) return resolve(null);           // handle null
+    if (!file) return resolve(null); // handle null/undefined
     if (typeof file === "string") return resolve(file); // already base64
+    if (!(file instanceof File || file instanceof Blob)) {
+      console.warn("Invalid file passed to fileToBase64:", file);
+      return resolve(null);
+    }
 
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
@@ -1410,7 +1413,12 @@ const handleDragOver = (e) => e.preventDefault();
       </div>
     </th>
                   <th>Description</th>
-                  <th>Material Thickness</th>
+                  <th>
+  <div>
+    Material<br />Thickness
+  </div>
+</th>
+
                   <th>Material Type to Material Type</th>
                   <th>Visual</th>
                   <th>Initial</th>
@@ -1734,27 +1742,27 @@ const handleDragOver = (e) => e.preventDefault();
   }} className="weldHistory">
   <colgroup>
     {/* First 5 columns: match Test Request exactly */}
-    <col style={{ width: "100px" }} /> {/* Weld No */}
-    <col style={{ width: "100px" }} /> {/* Welder ID */}
-    <col style={{ width: "145px" }} /> {/* Date */}
-    <col style={{ width: "125px" }} /> {/* WPS No */}
-    <col style={{ width: "150px" }} /> {/* Welding Process */}
+    <col style={{ width: '4%' }} /> {/* Weld No */}
+    <col style={{ width: '3.8%' }} /> {/* Welder ID */}
+    <col style={{ width: '5.6%' }} /> {/* Date */}
+    <col style={{ width: '4.9%' }} /> {/* WPS No */}
+    <col style={{ width: '5.9%' }} /> {/* Welding Process */}
 
     {/* Middle columns: widest is Description + Item to Item */}
-    <col style={{ width: "150px" }} /> {/* Welder & Pass No */}
-    <col style={{ width: "120px" }} /> {/* Weld Joint Type */}
-    <col style={{ width: "400px" }} /> {/* Item to Item and description */}
-    <col style={{ width: "200px" }} /> {/* Electrode Batch No */}
-    <col style={{ width: "120px" }} /> {/* Drawing No */}
-    <col style={{ width: "110px" }} /> {/* Prep checked by*/}
-    <col style={{ width: "100px" }} /> {/* Final Visual */}
-    <col style={{ width: "145px" }} /> {/* Date */}
+    <col style={{ width: '6%' }} /> {/* Welder & Pass No */}
+    <col style={{ width: '4.8%' }} /> {/* Weld Joint Type */}
+    <col style={{ width: '16%' }} /> {/* Item to Item and description */}
+    <col style={{ width: '8%' }} /> {/* Electrode Batch No */}
+    <col style={{ width: '4.8%' }} /> {/* Drawing No */}
+    <col style={{ width: '4.4%' }} /> {/* Prep checked by*/}
+    <col style={{ width: '4%' }} /> {/* Final Visual */}
+    <col style={{ width: '5.8%' }} /> {/* Date */}
 
     {/* NDE columns: same width as Test Request */}
-    <col style={{ width: "130px" }} /> {/* MTUT */}
-    <col style={{ width: "100px" }} /> {/* Initials */}
-    <col style={{ width: "130px" }} /> {/* Result */}
-    <col style={{ width: "180px" }} /> {/* Report No */}
+    <col style={{ width: '5.2%' }} /> {/* MTUT */}
+    <col style={{ width: '4%' }} /> {/* Initials */}
+    <col style={{ width: '5.2%' }} /> {/* Result */}
+    <col style={{ width: '7.2%' }} /> {/* Report No */}
   </colgroup>
   <thead>
     <tr>
